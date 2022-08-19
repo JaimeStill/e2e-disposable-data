@@ -1,0 +1,58 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build-client",
+            "command": "npm run build",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/app/"
+            }
+        },
+        {
+            "label": "build-server",
+            "command": "dotnet build /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary",
+            "type": "shell",
+            "problemMatcher": "$msCompile",
+            "options": {
+                "cwd": "${workspaceFolder}/server/"
+            }
+        },
+        {
+            "label": "start-client",
+            "command": "npm run start",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/app/"
+            },
+            "presentation": {
+                "panel": "dedicated"
+            },
+            "isBackground": true
+        },
+        {
+            "label": "start-server",
+            "command": "dotnet",
+            "type": "process",
+            "problemMatcher": "$msCompile",
+            "options": {
+                "cwd": "${workspaceFolder}/server/Brainstorm.Api/"
+            },
+            "args": [
+                "watch",
+                "run"
+            ],
+            "presentation": {
+                "panel": "dedicated"
+            }
+        },
+        {
+            "label": "update-database",
+            "command": "dotnet ef database update -s ../Brainstorm.Api",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceFolder}/server/Brainstorm.Data"
+            }
+        }
+    ]
+}

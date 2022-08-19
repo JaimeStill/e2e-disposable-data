@@ -1,0 +1,6 @@
+{
+	"ConnectionStrings": {
+		"App": "Server=.\\DevSql;Trusted_Connection=True;TrustServerCertificate=True;Database=brainstorm-dev",
+		"Test": "Server=.\\DevSql;Trusted_Connection=True;TrustServerCertificate=True;Database=brainstorm-test"
+	}
+}

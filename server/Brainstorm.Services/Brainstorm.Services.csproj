@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Brainstorm.Data\Brainstorm.Data.csproj" />
+    <ProjectReference Include="..\Brainstorm.Models\Brainstorm.Models.csproj" />
+    <ProjectReference Include="..\Brainstorm.Extensions\Brainstorm.Extensions.csproj" />
+  </ItemGroup>
+
+</Project>
