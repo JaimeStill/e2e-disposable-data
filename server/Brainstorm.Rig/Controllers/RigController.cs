@@ -1,5 +1,6 @@
 using Brainstorm.Data;
 using Brainstorm.Models;
+using Brainstorm.Rig.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Brainstorm.Rig.Controllers;
@@ -7,27 +8,21 @@ namespace Brainstorm.Rig.Controllers;
 [Route("api/[controller]")]
 public class RigController : Controller
 {
-    private DbManager manager;
+    readonly ApiRig rig;
 
-    public RigController(DbManager manager)
+    public RigController(ApiRig rig)
     {
-        this.manager = manager;
+        this.rig = rig;
     }
 
     [HttpGet("[action]")]
-    public string GetConnectionString() => manager.Connection;
+    public string GetConnectionString() => rig.Connection;
 
     [HttpGet("[action]")]
-    public async Task<bool> Initialize() =>
-        await manager.InitializeAsync();
+    public async Task<bool> InitializeDatabase() =>
+        await rig.InitializeDatabase();
 
-    [HttpPost("[action]")]
-    public async Task<T> SeedGraph<T>([FromBody]T entity)
-        where T : EntityBase =>
-        await manager.SeedGraph(entity);
-
-    [HttpPost("[action]")]
-    public async Task<List<T>> SeedGraphs<T>([FromBody]List<T> entities)
-        where T : EntityBase =>
-        await manager.SeedGraphs(entities);
+    [HttpGet("[action]")]
+    public bool StartProcess() =>
+        rig.StartProcess();
 }
