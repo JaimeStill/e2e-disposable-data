@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Brainstorm.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+DbManager manager = new("App", true, true);
 
 builder
     .Services
@@ -31,9 +32,11 @@ builder
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton(new DbManager("App", true, true));
+builder.Services.AddSingleton(manager);
 
 var app = builder.Build();
+
+app.Lifetime.ApplicationStopping.Register(() => manager.Dispose());
 
 if (app.Environment.IsDevelopment())
 {

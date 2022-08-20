@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Brainstorm.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace Brainstorm.Data;
@@ -39,6 +40,28 @@ public class DbManager : IDisposable
         Context = GetDbContext(GetConnectionString(env, isUnique));
     }
 
+    public async Task<T> SeedGraph<T>(T entity)
+        where T : EntityBase
+    {
+        await Context.Set<T>()
+            .AddAsync(entity);
+
+        await Context.SaveChangesAsync();
+
+        return entity;
+    }
+
+    public async Task<List<T>> SeedGraphs<T>(List<T> entities)
+        where T : EntityBase
+    {
+        await Context.Set<T>()
+            .AddRangeAsync(entities);
+
+        await Context.SaveChangesAsync();
+
+        return entities;
+    }
+
     public void Initialize()
     {
         if (destroy)
@@ -47,16 +70,27 @@ public class DbManager : IDisposable
         Context.Database.Migrate();
     }
 
-    public async Task InitializeAsync()
+    public async Task<bool> InitializeAsync()
     {
-        if (destroy)
-            await Context.Database.EnsureDeletedAsync();
+        try
+        {
+            if (destroy)
+                await Context.Database.EnsureDeletedAsync();
 
-        await Context.Database.MigrateAsync();
+            await Context.Database.MigrateAsync();
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public void Dispose()
     {
+        Console.WriteLine($"Disposing {Connection}");
+
         if (destroy)
             Context.Database.EnsureDeleted();
 
