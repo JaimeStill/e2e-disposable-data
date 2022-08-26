@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Brainstorm.Data\Brainstorm.Data.csproj" />
+    <ProjectReference Include="..\Brainstorm.Models\Brainstorm.Models.csproj" />
   </ItemGroup>
 
 </Project>

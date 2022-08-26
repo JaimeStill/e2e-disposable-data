@@ -19,7 +19,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build-server",
-            "program": "$(workspaceFolder)/server/Brainstorm.Rig/bin/Debug/net6.0/Brainstorm.Rig.dll",
+            "program": "${workspaceFolder}/server/Brainstorm.Rig/bin/Debug/net6.0/Brainstorm.Rig.dll",
             "args": [],
             "cwd": "${workspaceFolder}/server/Brainstorm.Rig",
             "stopAtEntry": false,
