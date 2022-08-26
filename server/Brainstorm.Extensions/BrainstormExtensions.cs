@@ -1,10 +1,6 @@
-﻿using System.Text.RegularExpressions;
-
-namespace Brainstorm.Extensions;
+﻿namespace Brainstorm.Extensions;
 public static class BrainstormExtensions
 {
-    private static readonly string urlPattern = "[^a-zA-Z0-9-.]";
-
     public static IQueryable<T> SetupSearch<T>(
         this IQueryable<T> values,
         string search,
@@ -25,14 +21,5 @@ public static class BrainstormExtensions
         }
         else
             return action(values, search);
-    }
-
-    public static string UrlEncode(this string url) => url.UrlEncode(urlPattern, "-");
-
-    public static string UrlEncode(this string url, string pattern, string replace = "")
-    {
-        var friendlyUrl = Regex.Replace(url, @"\s", "-").ToLower();
-        friendlyUrl = Regex.Replace(friendlyUrl, pattern, replace);
-        return friendlyUrl;
     }
 }

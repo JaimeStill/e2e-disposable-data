@@ -1,6 +1,5 @@
 using System.Text;
 using Brainstorm.Data;
-using Brainstorm.Extensions;
 using Brainstorm.Models.Entities;
 using Brainstorm.Models.Query;
 using Microsoft.EntityFrameworkCore;
@@ -51,11 +50,5 @@ public class NoteService : ServiceBase<Note>
             throw new Exception(exception.ToString());
 
         return true;
-    }
-
-    public override Task<Note> AddOrUpdate(Note note)
-    {
-        note.Url = note.Title.UrlEncode();
-        return base.AddOrUpdate(note);
     }
 }

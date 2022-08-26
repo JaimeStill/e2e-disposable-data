@@ -5,4 +5,6 @@ public class Topic : EntityBase
     public string Description { get; set; }
 
     public ICollection<Note> Notes { get; set; }
+
+    public override void Settle() => Url = Encode(Name);
 }

@@ -7,4 +7,6 @@ public class Note : EntityBase
     public int Priority { get; set; }
 
     public Topic Topic { get; set; }
+
+    public override void Settle() => Url = Encode(Title);
 }

@@ -1,6 +1,5 @@
 using System.Text;
 using Brainstorm.Data;
-using Brainstorm.Extensions;
 using Brainstorm.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,11 +33,5 @@ public class TopicService : ServiceBase<Topic>
             exception.AppendLine($"{topic.Name} is already a Topic");
 
         return true;            
-    }
-
-    public override Task<Topic> AddOrUpdate(Topic topic)
-    {
-        topic.Url = topic.Name.UrlEncode();
-        return base.AddOrUpdate(topic);
     }
 }

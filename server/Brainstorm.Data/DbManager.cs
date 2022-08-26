@@ -1,5 +1,4 @@
-﻿using Brainstorm.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace Brainstorm.Data;
@@ -29,6 +28,7 @@ public class DbManager : IDisposable
     static AppDbContext GetDbContext(string connection)
     {
         var builder = new DbContextOptionsBuilder<AppDbContext>()
+            .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
             .UseSqlServer(connection);
 
         return new AppDbContext(builder.Options);
@@ -38,29 +38,7 @@ public class DbManager : IDisposable
     {
         this.destroy = destroy;
         Context = GetDbContext(GetConnectionString(env, isUnique));
-    }
-
-    public async Task<T> SeedGraph<T>(T entity)
-        where T : EntityBase
-    {
-        await Context.Set<T>()
-            .AddAsync(entity);
-
-        await Context.SaveChangesAsync();
-
-        return entity;
-    }
-
-    public async Task<List<T>> SeedGraphs<T>(List<T> entities)
-        where T : EntityBase
-    {
-        await Context.Set<T>()
-            .AddRangeAsync(entities);
-
-        await Context.SaveChangesAsync();
-
-        return entities;
-    }
+    }    
 
     public void Initialize()
     {

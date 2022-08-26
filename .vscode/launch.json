@@ -1,0 +1,31 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug API",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-server",
+            "program": "${workspaceFolder}/server/Brainstorm.Api/bin/Debug/net6.0/Brainstorm.Api.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/server/Brainstorm.Api",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        },
+        {
+            "name": "Debug Rig",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build-server",
+            "program": "$(workspaceFolder)/server/Brainstorm.Rig/bin/Debug/net6.0/Brainstorm.Rig.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/server/Brainstorm.Rig",
+            "stopAtEntry": false,
+            "env": {
+                "ASPNETCORE_ENVIRONMENT": "Development"
+            }
+        }
+    ]
+}

@@ -5,6 +5,8 @@ public class ProcessRunner : IDisposable
 {
     readonly Process process;
 
+    bool CheckProcess => Process.GetProcessesByName(process?.ProcessName).Any();
+
     public bool? Running { get; private set; } = null;
 
     static ProcessStartInfo GetConfiguration(string connection) =>
@@ -31,9 +33,7 @@ public class ProcessRunner : IDisposable
     DataReceivedEventHandler ProcessError =>
         new((sender, e) =>
         {
-            if (!Running.HasValue)
-                Running = false;
-
+            Running = CheckProcess;
             Console.WriteLine(e.Data);
         });
 
@@ -62,7 +62,9 @@ public class ProcessRunner : IDisposable
 
     public void Dispose()
     {
-        process.Kill();
+        if (Running.Value)
+            process.Kill();
+
         process.Dispose();
         GC.SuppressFinalize(this);
     }
