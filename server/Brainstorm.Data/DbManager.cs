@@ -48,12 +48,14 @@ public class DbManager : IDisposable
         Context.Database.Migrate();
     }
 
+    public Task<bool> Destroy() => Context.Database.EnsureDeletedAsync();
+
     public async Task<bool> InitializeAsync()
     {
         try
         {
             if (destroy)
-                await Context.Database.EnsureDeletedAsync();
+                await Destroy();
 
             await Context.Database.MigrateAsync();
 

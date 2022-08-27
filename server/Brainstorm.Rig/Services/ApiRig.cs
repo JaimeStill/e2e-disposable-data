@@ -16,7 +16,9 @@ public class ApiRig : IDisposable
 
     public string Connection => manager.Connection;
     public Task<bool> InitializeDatabase() => manager.InitializeAsync();
+    public Task<bool> DestroyDatabase() => manager.Destroy();
     public bool StartProcess() => runner.Start();
+    public bool KillProcess() => runner.Kill();
 
     public void Dispose()
     {

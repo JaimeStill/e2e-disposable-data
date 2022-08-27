@@ -19,6 +19,10 @@ export class AppComponent {
     private init = async () => {
         const rig = new Rig();
         const connection = await rig.getConnectionString();
+        const initialized = await rig.initializeDatabase();
+        const processStarted = await rig.startProcess();
         console.log('Connection', connection);
+        console.log('Initialized', initialized);
+        console.log('Process Started', processStarted);
     }
 }

@@ -5,7 +5,9 @@ public class ProcessRunner : IDisposable
 {
     readonly Process process;
 
-    bool CheckProcess => Process.GetProcessesByName(process?.ProcessName).Any();
+    Process[] Processes => Process.GetProcessesByName(process?.ProcessName);
+
+    bool CheckProcess => Processes.Any();
 
     public bool? Running { get; private set; } = null;
 
@@ -50,6 +52,8 @@ public class ProcessRunner : IDisposable
 
     public bool Start()
     {
+        Kill();
+
         var res = process.Start();
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
@@ -60,11 +64,29 @@ public class ProcessRunner : IDisposable
         return res;
     }
 
+    public bool Kill()
+    {
+        try
+        {
+            process.CancelOutputRead();
+            process.CancelErrorRead();
+
+            if (CheckProcess)
+                Processes
+                    .ToList()
+                    .ForEach(x => x.Kill());
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     public void Dispose()
     {
-        if (Running.Value)
-            process.Kill();
-
+        Kill();
         process.Dispose();
         GC.SuppressFinalize(this);
     }
