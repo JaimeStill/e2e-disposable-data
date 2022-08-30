@@ -1,6 +1,5 @@
 import {
-    Note,
-    Topic
+    EntityBase
 } from './app/models';
 
 export default class Rig {
@@ -12,11 +11,20 @@ export default class Rig {
         this.baseUrl = url ?? `http://localhost:5001/api/rig/`;
     }
 
-    protected
-
     getConnectionString = async (): Promise<string> => (await fetch(`${this.baseUrl}getConnectionString`)).text();
 
     initializeDatabase = async (): Promise<boolean> => (await fetch(`${this.baseUrl}initializeDatabase`)).json();
 
     startProcess = async(): Promise<boolean> => (await fetch(`${this.baseUrl}startProcess`)).json();
+
+    seed = async <T extends EntityBase>(entity: T, endpoint: string) => (
+        await fetch(`${this.baseUrl}${endpoint}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(entity)
+        })
+    ).json();
 }
