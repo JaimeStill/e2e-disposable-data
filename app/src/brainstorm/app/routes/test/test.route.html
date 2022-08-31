@@ -3,26 +3,34 @@
                   color="primary"
                   mode="indeterminate"></mat-progress-bar>
 <section fxLayout="row | wrap"
-         fxLayoutAlign="space-evenly start"
-         class="p8">
-    <button-block label="Get Connection String"
-                  [disabled]="loading"
-                  (action)="getConnection()">
-        <p class="m4 word-break-all">
-            {{connection ?? 'No Connection Retrieved'}}
-        </p>
-    </button-block>
-    <status-button label="Initialize Database"
-                   [disabled]="loading"
-                   [status]="initialized"
-                   (action)="initializeDatabase()"></status-button>
-    <status-button label="Start API Server"
-                   [disabled]="loading"
-                   [status]="processStarted"
-                   (action)="startProcess()"></status-button>
-    <status-button label="Seed Topic"
-                   [disabled]="loading"
-                   [status]="topic?.id > 0"
-                   (action)="seedTopic()"></status-button>
+         fxLayoutAlign="start start"
+         fxLayoutGap="8px">
+    <section fxLayout="column"
+             fxLayoutAlign="start start"
+             class="p8">
+        <button-block label="Get Connection String"
+                      [disabled]="loading"
+                      (action)="getConnection()">
+            <p class="m4 word-break-all">
+                {{connection ?? 'No Connection Retrieved'}}
+            </p>
+        </button-block>
+        <card>
+            <mat-slide-toggle [disabled]="loading"
+                              (change)="toggleDatabase()">
+                {{initialized ? 'Destroy Database' : 'Initialize Database'}}
+            </mat-slide-toggle>
+        </card>
+        <card>
+            <mat-slide-toggle [disabled]="loading"
+                              (change)="toggleProcess()">
+                {{processStarted ? 'Kill Process' : 'Start Process'}}
+            </mat-slide-toggle>
+        </card>
+        <status-button label="Seed Topic"
+                       [disabled]="loading || topic?.id > 0"
+                       [status]="topic?.id > 0"
+                       (action)="seedTopic()"></status-button>
+    </section>
+    <pre class="p8 m8"><code class="color-green">{{topic | json}}</code></pre>
 </section>
-<pre class="p8 m8"><code class="color-green">{{topic | json}}</code></pre>

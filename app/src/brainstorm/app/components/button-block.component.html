@@ -1,7 +1,4 @@
-<section fxLayout="column"
-         fxLayoutAlign="center center"
-         class="card-outline-accent rounded p8"
-         [style.width.px]="width">
+<card [width]="width">
     <button mat-stroked-button
             class="m4"
             [disabled]="disabled"
@@ -9,4 +6,4 @@
         {{label}}
     </button>
     <ng-content></ng-content>
-</section>
+</card>

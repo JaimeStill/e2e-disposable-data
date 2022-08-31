@@ -6,7 +6,7 @@ public class ProcessRunner : IDisposable
     readonly Process process;
     bool disposed = false;
 
-    public bool? Running { get; private set; } = null;
+    public bool Running { get; private set; } = false;
 
     static ProcessStartInfo GetConfiguration(string connection) =>
         new()
@@ -20,10 +20,21 @@ public class ProcessRunner : IDisposable
             RedirectStandardError = true
         };
 
+    void EndProcess()
+    {
+        if (disposed)
+            return;
+
+        Kill();
+        process.Dispose();
+
+        disposed = true;
+    }
+
     DataReceivedEventHandler ProcessOutput =>
         new((sender, e) =>
         {
-            if (!Running.HasValue && e.Data.Contains("Now listening on: http://localhost:5000"))
+            if (!Running && e.Data.Contains("Now listening on: http://localhost:5000"))
                 Running = true;
 
             Console.WriteLine(e.Data);
@@ -65,20 +76,9 @@ public class ProcessRunner : IDisposable
         process.BeginErrorReadLine();
 
         if (res)
-            while (!Running.HasValue) { }
+            while (!Running) { }
 
         return res;
-    }
-
-    public void EndProcess()
-    {
-        if (disposed)
-            return;
-
-        Kill();
-        process.Dispose();
-
-        disposed = true;
     }
 
     public bool Kill()
@@ -88,8 +88,10 @@ public class ProcessRunner : IDisposable
             process.CancelOutputRead();
             process.CancelErrorRead();
 
-            if (Running.Value)
+            if (Running)
                 process.Kill();
+
+            Running = false;
 
             return true;
         }

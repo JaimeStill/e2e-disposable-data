@@ -31,6 +31,35 @@ export class TestRoute {
         ]
     }
 
+    private initializeDatabase = async () => {
+        this.loading = true;
+        this.initialized = false;
+        this.initialized = await this.rig.initializeDatabase();
+        console.log('Initialized', this.initialized);
+        this.loading = false;
+    }
+
+    private destroyDatabase = async () => {
+        this.loading = true;
+        this.initialized = !await this.rig.destroyDatabase();
+        console.log('Destroyed', !this.initialized);
+        this.loading = false;
+    }
+
+    private startProcess = async () => {
+        this.loading = true;
+        this.processStarted = await this.rig.startProcess();
+        console.log('Process Started', this.processStarted);
+        this.loading = false;
+    }
+
+    private killProcess = async () => {
+        this.loading = true;
+        this.processStarted = !await this.rig.killProcess();
+        console.log('Process Ended', !this.processStarted);
+        this.loading = false;
+    }
+
     getConnection = async () => {
         this.loading = true;
         this.connection = await this.rig.getConnectionString();
@@ -38,19 +67,13 @@ export class TestRoute {
         this.loading = false;
     }
 
-    initializeDatabase = async () => {
-        this.loading = true;
-        this.initialized = await this.rig.initializeDatabase();
-        console.log('Initialized', this.initialized);
-        this.loading = false;
-    }
+    toggleDatabase = () => this.initialized
+        ? this.destroyDatabase()
+        : this.initializeDatabase();
 
-    startProcess = async () => {
-        this.loading = true;
-        this.processStarted = await this.rig.startProcess();
-        console.log('Process Started', this.processStarted);
-        this.loading = false;
-    }
+    toggleProcess = () => this.processStarted
+        ? this.killProcess()
+        : this.startProcess();
 
     seedTopic = async () => {
         this.loading = true;
