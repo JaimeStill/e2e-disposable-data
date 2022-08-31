@@ -11,62 +11,6 @@
         </button>
     </mat-toolbar>
     <section class="app-container">
-        <section fxLayout="row | wrap"
-                 fxLayoutAlign="space-evenly center"
-                 class="p8">
-            <section fxLayout="column"
-                     fxLayoutAlign="center center"
-                     class="card-outline-accent rounded p8 m4"
-                     [style.width.px]="360">
-                <button mat-stroked-button
-                        class="m4"
-                        (click)="getConnection()">Get Connection String</button>
-                <p class="m4"
-                   [style.word-break]="'break-all'">{{connection ?? 'No Connection Retrieved'}}</p>
-            </section>
-            <section fxLayout="column"
-                     fxLayoutAlign="center center"
-                     class="card-outline-accent rounded p8"
-                     [style.width.px]="360">
-                <button mat-stroked-button
-                        class="m4"
-                        (click)="initializeDatabase()">
-                    Initialize Database
-                </button>
-                <mat-icon *ngIf="initialized"
-                          class="color-green m4">check_circle</mat-icon>
-                <mat-icon *ngIf="!(initialized)"
-                          class="color-red m4">warning</mat-icon>
-            </section>
-            <section fxLayout="column"
-                     fxLayoutAlign="center center"
-                     class="card-outline-accent rounded p8"
-                     [style.width.px]="360">
-                <button mat-stroked-button
-                        class="m4"
-                        (click)="startProcess()">
-                    Start API Server
-                </button>
-                <mat-icon *ngIf="processStarted"
-                          class="color-green m4">check_circle</mat-icon>
-                <mat-icon *ngIf="!(processStarted)"
-                          class="color-red m4">warning</mat-icon>
-            </section>
-            <section fxLayout="column"
-                     fxLayoutAlign="center center"
-                     class="card-outline-accent rounded p8"
-                     [style.width.px]="360">
-                <button mat-stroked-button
-                        class="m4"
-                        (click)="seedTopic()">
-                    Seed Topic
-                </button>
-                <mat-icon *ngIf="topic?.id > 0"
-                          class="color-green m4">check_circle</mat-icon>
-                <mat-icon *ngIf="!(topic?.id > 0)"
-                          class="color-red m4">warning</mat-icon>
-            </section>
-        </section>
         <router-outlet></router-outlet>
     </section>
 </section>

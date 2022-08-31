@@ -13,7 +13,7 @@ public class ProcessRunner : IDisposable
 
     static ProcessStartInfo GetConfiguration(string connection) =>
         new()
-        {
+        {            
             FileName = "dotnet",
             Arguments = $"run --project \"..\\Brainstorm.Api\" /ConnectionStrings:App=\"{connection}\"",
             WindowStyle = ProcessWindowStyle.Hidden,
@@ -57,6 +57,10 @@ public class ProcessRunner : IDisposable
         var res = process.Start();
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
+
+        Console.WriteLine(process.Id);
+        Console.WriteLine(process.ProcessName);
+        Console.WriteLine(process.MainModule);
 
         if (res)
             while (!Running.HasValue) { }

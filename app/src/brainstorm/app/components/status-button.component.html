@@ -1,0 +1,9 @@
+<button-block [label]="label"
+              [disabled]="disabled"
+              [width]="width"
+              (action)="action.emit()">
+    <mat-icon *ngIf="status"
+              class="color-green m4">check_circle</mat-icon>
+    <mat-icon *ngIf="!(status)"
+              class="color-red m4">warning</mat-icon>
+</button-block>

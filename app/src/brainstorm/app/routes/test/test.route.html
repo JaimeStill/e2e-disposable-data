@@ -1,0 +1,28 @@
+<p class="mat-title m8">Test Rig API</p>
+<mat-progress-bar *ngIf="loading"
+                  color="primary"
+                  mode="indeterminate"></mat-progress-bar>
+<section fxLayout="row | wrap"
+         fxLayoutAlign="space-evenly start"
+         class="p8">
+    <button-block label="Get Connection String"
+                  [disabled]="loading"
+                  (action)="getConnection()">
+        <p class="m4 word-break-all">
+            {{connection ?? 'No Connection Retrieved'}}
+        </p>
+    </button-block>
+    <status-button label="Initialize Database"
+                   [disabled]="loading"
+                   [status]="initialized"
+                   (action)="initializeDatabase()"></status-button>
+    <status-button label="Start API Server"
+                   [disabled]="loading"
+                   [status]="processStarted"
+                   (action)="startProcess()"></status-button>
+    <status-button label="Seed Topic"
+                   [disabled]="loading"
+                   [status]="topic?.id > 0"
+                   (action)="seedTopic()"></status-button>
+</section>
+<pre class="p8 m8"><code class="color-green">{{topic | json}}</code></pre>
