@@ -4,16 +4,13 @@ namespace Brainstorm.Rig.Services;
 public class ProcessRunner : IDisposable
 {
     readonly Process process;
-
-    Process[] Processes => Process.GetProcessesByName(process?.ProcessName);
-
-    bool CheckProcess => Processes.Any();
+    bool disposed = false;
 
     public bool? Running { get; private set; } = null;
 
     static ProcessStartInfo GetConfiguration(string connection) =>
         new()
-        {            
+        {
             FileName = "dotnet",
             Arguments = $"run --project \"..\\Brainstorm.Api\" /ConnectionStrings:App=\"{connection}\"",
             WindowStyle = ProcessWindowStyle.Hidden,
@@ -35,9 +32,12 @@ public class ProcessRunner : IDisposable
     DataReceivedEventHandler ProcessError =>
         new((sender, e) =>
         {
-            Running = CheckProcess;
+            Running = !process.HasExited;
             Console.WriteLine(e.Data);
         });
+
+    EventHandler ProcessExit =>
+        new ((sender, e) => Running = false);
 
     public ProcessRunner(string connection)
     {
@@ -48,6 +48,12 @@ public class ProcessRunner : IDisposable
 
         process.OutputDataReceived += ProcessOutput;
         process.ErrorDataReceived += ProcessError;
+        process.Exited += ProcessExit;
+    }
+
+    ~ProcessRunner()
+    {
+        EndProcess();
     }
 
     public bool Start()
@@ -58,14 +64,21 @@ public class ProcessRunner : IDisposable
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
-        Console.WriteLine(process.Id);
-        Console.WriteLine(process.ProcessName);
-        Console.WriteLine(process.MainModule);
-
         if (res)
             while (!Running.HasValue) { }
 
         return res;
+    }
+
+    public void EndProcess()
+    {
+        if (disposed)
+            return;
+
+        Kill();
+        process.Dispose();
+
+        disposed = true;
     }
 
     public bool Kill()
@@ -75,10 +88,8 @@ public class ProcessRunner : IDisposable
             process.CancelOutputRead();
             process.CancelErrorRead();
 
-            if (CheckProcess)
-                Processes
-                    .ToList()
-                    .ForEach(x => x.Kill());
+            if (Running.Value)
+                process.Kill();
 
             return true;
         }
@@ -90,8 +101,7 @@ public class ProcessRunner : IDisposable
 
     public void Dispose()
     {
-        Kill();
-        process.Dispose();
+        EndProcess();
         GC.SuppressFinalize(this);
     }
 }
