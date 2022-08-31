@@ -1,0 +1,9 @@
+<card [width]="width">
+    <button mat-stroked-button
+            class="m4"
+            [disabled]="disabled"
+            (click)="action.emit()">
+        {{label}}
+    </button>
+    <ng-content></ng-content>
+</card>

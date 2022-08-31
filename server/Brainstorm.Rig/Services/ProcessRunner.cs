@@ -4,12 +4,9 @@ namespace Brainstorm.Rig.Services;
 public class ProcessRunner : IDisposable
 {
     readonly Process process;
+    bool disposed = false;
 
-    Process[] Processes => Process.GetProcessesByName(process?.ProcessName);
-
-    bool CheckProcess => Processes.Any();
-
-    public bool? Running { get; private set; } = null;
+    public bool Running { get; private set; } = false;
 
     static ProcessStartInfo GetConfiguration(string connection) =>
         new()
@@ -23,10 +20,21 @@ public class ProcessRunner : IDisposable
             RedirectStandardError = true
         };
 
+    void EndProcess()
+    {
+        if (disposed)
+            return;
+
+        Kill();
+        process.Dispose();
+
+        disposed = true;
+    }
+
     DataReceivedEventHandler ProcessOutput =>
         new((sender, e) =>
         {
-            if (!Running.HasValue && e.Data.Contains("Now listening on: http://localhost:5000"))
+            if (!Running && e.Data.Contains("Now listening on: http://localhost:5000"))
                 Running = true;
 
             Console.WriteLine(e.Data);
@@ -35,9 +43,12 @@ public class ProcessRunner : IDisposable
     DataReceivedEventHandler ProcessError =>
         new((sender, e) =>
         {
-            Running = CheckProcess;
+            Running = !process.HasExited;
             Console.WriteLine(e.Data);
         });
+
+    EventHandler ProcessExit =>
+        new ((sender, e) => Running = false);
 
     public ProcessRunner(string connection)
     {
@@ -48,6 +59,12 @@ public class ProcessRunner : IDisposable
 
         process.OutputDataReceived += ProcessOutput;
         process.ErrorDataReceived += ProcessError;
+        process.Exited += ProcessExit;
+    }
+
+    ~ProcessRunner()
+    {
+        EndProcess();
     }
 
     public bool Start()
@@ -59,7 +76,7 @@ public class ProcessRunner : IDisposable
         process.BeginErrorReadLine();
 
         if (res)
-            while (!Running.HasValue) { }
+            while (!Running) { }
 
         return res;
     }
@@ -71,10 +88,10 @@ public class ProcessRunner : IDisposable
             process.CancelOutputRead();
             process.CancelErrorRead();
 
-            if (CheckProcess)
-                Processes
-                    .ToList()
-                    .ForEach(x => x.Kill());
+            if (Running)
+                process.Kill();
+
+            Running = false;
 
             return true;
         }
@@ -86,8 +103,7 @@ public class ProcessRunner : IDisposable
 
     public void Dispose()
     {
-        Kill();
-        process.Dispose();
+        EndProcess();
         GC.SuppressFinalize(this);
     }
 }
