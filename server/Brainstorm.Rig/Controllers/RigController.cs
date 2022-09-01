@@ -1,4 +1,5 @@
 using Brainstorm.Models.Entities;
+using Brainstorm.Rig.Models;
 using Brainstorm.Rig.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,22 +16,22 @@ public class RigController : Controller
     }
 
     [HttpGet("[action]")]
-    public string GetConnectionString() => rig.Connection;
+    public RigState GetState() => rig.State;
 
     [HttpGet("[action]")]
-    public async Task<bool> InitializeDatabase() =>
+    public async Task<RigState> InitializeDatabase() =>
         await rig.InitializeDatabase();
 
     [HttpGet("[action]")]
-    public async Task<bool> DestroyDatabase() =>
+    public async Task<RigState> DestroyDatabase() =>
         await rig.DestroyDatabase();
 
     [HttpGet("[action]")]
-    public bool StartProcess() =>
+    public RigState StartProcess() =>
         rig.StartProcess();
 
     [HttpGet("[action]")]
-    public bool KillProcess() =>
+    public RigState KillProcess() =>
         rig.KillProcess();
 
     [HttpPost("[action]")]

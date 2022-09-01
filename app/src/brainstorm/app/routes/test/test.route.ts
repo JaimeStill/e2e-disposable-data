@@ -1,5 +1,9 @@
 import { Component } from '@angular/core';
-import Rig from '../../../rig';
+
+import {
+    Rig,
+    RigState
+} from '../../../rig';
 
 import {
     Note,
@@ -12,11 +16,18 @@ import {
 })
 export class TestRoute {
     private rig: Rig = new Rig();
+    state: RigState;
+    loading: boolean = true;
 
-    connection: string | null = null;
-    initialized: boolean = false;
-    loading: boolean = false;
-    processStarted: boolean = false;
+    private init = async () => {
+        this.state = await this.rig.getState();
+        console.table(this.state);
+        this.loading = false;
+    }
+
+    constructor() {
+        this.init();
+    }
 
     topic: Topic = {
         id: 0,
@@ -33,45 +44,37 @@ export class TestRoute {
 
     private initializeDatabase = async () => {
         this.loading = true;
-        this.initialized = false;
-        this.initialized = await this.rig.initializeDatabase();
-        console.log('Initialized', this.initialized);
+        this.state = await this.rig.initializeDatabase();
+        console.table(this.state);
         this.loading = false;
     }
 
     private destroyDatabase = async () => {
         this.loading = true;
-        this.initialized = !await this.rig.destroyDatabase();
-        console.log('Destroyed', !this.initialized);
+        this.state = await this.rig.destroyDatabase();
+        console.table(this.state);
         this.loading = false;
     }
 
     private startProcess = async () => {
         this.loading = true;
-        this.processStarted = await this.rig.startProcess();
-        console.log('Process Started', this.processStarted);
+        this.state = await this.rig.startProcess();
+        console.table(this.state);
         this.loading = false;
     }
 
     private killProcess = async () => {
         this.loading = true;
-        this.processStarted = !await this.rig.killProcess();
-        console.log('Process Ended', !this.processStarted);
+        this.state = await this.rig.killProcess();
+        console.table(this.state);
         this.loading = false;
     }
 
-    getConnection = async () => {
-        this.loading = true;
-        this.connection = await this.rig.getConnectionString();
-        console.log('Connection', this.connection);
-        this.loading = false;
-    }
-
-    toggleDatabase = () => this.initialized
+    toggleDatabase = () => this.state.databaseCreated
         ? this.destroyDatabase()
         : this.initializeDatabase();
 
-    toggleProcess = () => this.processStarted
+    toggleProcess = () => this.state.processRunning
         ? this.killProcess()
         : this.startProcess();
 

@@ -2,7 +2,13 @@ import {
     EntityBase
 } from './app/models';
 
-export default class Rig {
+export class RigState {
+    connection: string;
+    databaseCreated: boolean;
+    processRunning: boolean;
+}
+
+export class Rig {
     protected readonly baseUrl: string;
     protected post = async (endpoint: string, data: string): Promise<any> => (
         await fetch(endpoint, {
@@ -21,19 +27,19 @@ export default class Rig {
         this.baseUrl = url ?? `http://localhost:5001/api/rig/`;
     }
 
-    getConnectionString = async (): Promise<string> =>
-        (await fetch(`${this.baseUrl}getConnectionString`)).text();
+    getState = async (): Promise<RigState> =>
+        (await fetch(`${this.baseUrl}getState`)).json();
 
-    initializeDatabase = async (): Promise<boolean> =>
+    initializeDatabase = async (): Promise<RigState> =>
         (await fetch(`${this.baseUrl}initializeDatabase`)).json();
 
-    destroyDatabase = async (): Promise<boolean> =>
+    destroyDatabase = async (): Promise<RigState> =>
         (await fetch(`${this.baseUrl}destroyDatabase`)).json();
 
-    startProcess = async (): Promise<boolean> =>
+    startProcess = async (): Promise<RigState> =>
         (await fetch(`${this.baseUrl}startProcess`)).json();
 
-    killProcess = async (): Promise<boolean> =>
+    killProcess = async (): Promise<RigState> =>
         (await fetch(`${this.baseUrl}killProcess`)).json();
 
     seed = async <T extends EntityBase>(entity: T, endpoint: string) =>
