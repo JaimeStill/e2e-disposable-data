@@ -27,12 +27,12 @@ public class RigController : Controller
         await rig.DestroyDatabase();
 
     [HttpGet("[action]")]
-    public RigState StartProcess() =>
-        rig.StartProcess();
+    public async Task<RigState> StartProcess() =>
+        await rig.StartProcess();
 
     [HttpGet("[action]")]
-    public RigState KillProcess() =>
-        rig.KillProcess();
+    public async Task<RigState> KillProcess() =>
+        await rig.KillProcess();
 
     [HttpPost("[action]")]
     public async Task<IActionResult> SeedTopic([FromBody]Topic topic) =>

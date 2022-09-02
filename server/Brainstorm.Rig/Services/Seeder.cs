@@ -11,12 +11,19 @@ public class Seeder
         Context = context;
     }
 
+    public event EventHandler<DataSeededEventArgs> DataSeeded;
+
+    void OnDataSeeded(string method) =>
+        DataSeeded.Invoke(this, new() { Message = $"{method} data successfully saved"});
+
     public async Task<T> Seed<T>(T entity) where T : EntityBase
     {
         await Context.Set<T>()
             .AddAsync(entity);
 
         await Context.SaveChangesAsync();
+
+        OnDataSeeded($"Seed<{typeof(T)}>");
 
         return entity;
     }
@@ -28,6 +35,13 @@ public class Seeder
 
         await Context.SaveChangesAsync();
 
+        OnDataSeeded($"SeedMany<{typeof(T)}>");
+
         return entities;
     }
+}
+
+public class DataSeededEventArgs : EventArgs
+{
+    public string Message { get; set; }
 }

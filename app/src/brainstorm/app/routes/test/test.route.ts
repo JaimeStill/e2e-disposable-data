@@ -2,8 +2,10 @@ import { Component } from '@angular/core';
 
 import {
     Rig,
+    RigOutput,
+    RigSocket,
     RigState
-} from '../../../rig';
+} from '../../../../rig';
 
 import {
     Note,
@@ -17,6 +19,7 @@ import {
 export class TestRoute {
     private rig: Rig = new Rig();
     state: RigState;
+    socket: RigSocket;
     loading: boolean = true;
 
     private init = async () => {
@@ -27,6 +30,7 @@ export class TestRoute {
 
     constructor() {
         this.init();
+        this.socket = new RigSocket();
     }
 
     topic: Topic = {

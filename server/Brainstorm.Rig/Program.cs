@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Brainstorm.Rig.Hubs;
 using Brainstorm.Rig.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,13 +10,14 @@ builder
     .AddCors(options =>
         options.AddDefaultPolicy(policy =>
         {
-            policy.AllowAnyOrigin();
-            policy.AllowAnyHeader();
-            policy.AllowAnyMethod();
-            policy.WithExposedHeaders(
-                "Content-Disposition",
-                "Access-Control-Allow-Origin"
-            );
+            policy.WithOrigins(GetConfigArray("CorsOrigins"))
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+                .WithExposedHeaders(
+                    "Content-Disposition",
+                    "Access-Control-Allow-Origin"
+                );
         })
     );
 
@@ -31,6 +33,7 @@ builder
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 builder.Services.AddSingleton<ApiRig>();
 
 var app = builder.Build();
@@ -42,7 +45,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
-
+app.UseRouting();
 app.MapControllers();
-
+app.MapHubs();
 app.Run();
+
+string[] GetConfigArray(string section) =>
+    builder.Configuration
+        .GetSection(section)
+        .GetChildren()
+        .Select(x => x.Value)
+        .ToArray();

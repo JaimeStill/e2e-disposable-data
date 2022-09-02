@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace Brainstorm.Rig.Services;
 public class ProcessRunner : IDisposable
 {
-    readonly Process process;
+    public readonly Process Process;
     bool disposed = false;
 
     public bool Running { get; private set; } = false;
@@ -26,12 +26,12 @@ public class ProcessRunner : IDisposable
             return;
 
         Kill();
-        process.Dispose();
+        Process.Dispose();
 
         disposed = true;
     }
 
-    DataReceivedEventHandler ProcessOutput =>
+    DataReceivedEventHandler ProcessOutput => 
         new((sender, e) =>
         {
             if (!Running && e.Data.Contains("Now listening on: http://localhost:5000"))
@@ -43,7 +43,7 @@ public class ProcessRunner : IDisposable
     DataReceivedEventHandler ProcessError =>
         new((sender, e) =>
         {
-            Running = !process.HasExited;
+            Running = !Process.HasExited;
             Console.WriteLine(e.Data);
         });
 
@@ -52,14 +52,14 @@ public class ProcessRunner : IDisposable
 
     public ProcessRunner(string connection)
     {
-        process = new()
+        Process = new()
         {
             StartInfo = GetConfiguration(connection)
         };
 
-        process.OutputDataReceived += ProcessOutput;
-        process.ErrorDataReceived += ProcessError;
-        process.Exited += ProcessExit;
+        Process.OutputDataReceived += ProcessOutput;
+        Process.ErrorDataReceived += ProcessError;
+        Process.Exited += ProcessExit;
     }
 
     ~ProcessRunner()
@@ -71,9 +71,9 @@ public class ProcessRunner : IDisposable
     {
         Kill();
 
-        var res = process.Start();
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
+        var res = Process.Start();
+        Process.BeginOutputReadLine();
+        Process.BeginErrorReadLine();
 
         if (res)
             while (!Running) { }
@@ -88,9 +88,9 @@ public class ProcessRunner : IDisposable
 
             if (Running)
             {
-                process.CancelOutputRead();
-                process.CancelErrorRead();
-                process.Kill();
+                Process.CancelOutputRead();
+                Process.CancelErrorRead();
+                Process.Kill();
             }
 
             Running = false;
