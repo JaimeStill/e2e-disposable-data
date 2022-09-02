@@ -5,7 +5,8 @@
 export const environment = {
   production: false,
   server: 'http://localhost:5000/',
-  api: 'http://localhost:5000/api/'
+  api: 'http://localhost:5000/api/',
+  rig: 'http://localhost:5001/'
 };
 
 /*

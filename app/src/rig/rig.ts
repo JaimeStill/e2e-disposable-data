@@ -1,12 +1,8 @@
 import {
     EntityBase
-} from './app/models';
+} from '../brainstorm/app/models';
 
-export class RigState {
-    connection: string;
-    databaseCreated: boolean;
-    processRunning: boolean;
-}
+import { RigState } from './rig-state';
 
 export class Rig {
     protected readonly baseUrl: string;

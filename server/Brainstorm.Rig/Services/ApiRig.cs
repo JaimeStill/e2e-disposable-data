@@ -1,18 +1,51 @@
+using System.Diagnostics;
 using Brainstorm.Data;
+using Brainstorm.Rig.Hubs;
 using Brainstorm.Rig.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Brainstorm.Rig.Services;
 public class ApiRig : IDisposable
 {
     DbManager manager;
     ProcessRunner runner;
+    readonly IHubContext<RigHub> socket;
     public Seeder Seeder { get; private set; }
     public RigState State { get; private set; }
 
-    public ApiRig()
+    public ApiRig(IHubContext<RigHub> socket)
     {
+        this.socket = socket;
         ResetDbManager();
         State = InitState();
+    }
+
+    static RigOutput CreateMessage(string message, RigState state, bool error = false, bool exiting = false) =>
+        new()
+        {
+            Exiting = exiting,
+            Output = new RigMessage
+            {
+                IsError = error,
+                Message = message
+            },
+            State = state
+        };
+
+    DataReceivedEventHandler ProcessOutput =>
+        new(async (sender, e) => await socket.Clients.All.SendAsync("output", CreateMessage(e.Data, State)));
+
+    DataReceivedEventHandler ProcessError =>
+        new(async (sender, e) => await socket.Clients.All.SendAsync("output", CreateMessage(e.Data, State, true)));
+
+    EventHandler ProcessExit =>
+        new(async (sender, e) => await socket.Clients.All.SendAsync("output", CreateMessage("Process exitied", State, false, true)));
+
+    void RegisterProcessStreams()
+    {
+        runner.Process.OutputDataReceived += ProcessOutput;
+        runner.Process.ErrorDataReceived += ProcessError;
+        runner.Process.Exited += ProcessExit;
     }
 
     RigState InitState() => new()
@@ -34,6 +67,7 @@ public class ApiRig : IDisposable
 
         manager = new("App", true, true);
         runner = new(manager.Connection);
+        RegisterProcessStreams();
 
         if (restartProcess)
             StartProcess();
