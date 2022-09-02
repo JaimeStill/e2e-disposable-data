@@ -48,7 +48,7 @@ public class ProcessRunner : IDisposable
         });
 
     EventHandler ProcessExit =>
-        new ((sender, e) => Running = false);
+        new((sender, e) => Running = false);
 
     public ProcessRunner(string connection)
     {
@@ -85,11 +85,13 @@ public class ProcessRunner : IDisposable
     {
         try
         {
-            process.CancelOutputRead();
-            process.CancelErrorRead();
 
             if (Running)
+            {
+                process.CancelOutputRead();
+                process.CancelErrorRead();
                 process.Kill();
+            }
 
             Running = false;
 

@@ -1,24 +1,78 @@
 using Brainstorm.Data;
+using Brainstorm.Rig.Models;
 
 namespace Brainstorm.Rig.Services;
 public class ApiRig : IDisposable
 {
-    readonly DbManager manager;
-    readonly ProcessRunner runner;
+    DbManager manager;
+    ProcessRunner runner;
     public Seeder Seeder { get; private set; }
+    public RigState State { get; private set; }
 
     public ApiRig()
     {
-        manager = new("App", true, true);
-        runner = new(Connection);
-        Seeder = new(manager.Context);
+        ResetDbManager();
+        State = InitState();
     }
 
-    public string Connection => manager.Connection;
-    public Task<bool> InitializeDatabase() => manager.InitializeAsync();
-    public Task<bool> DestroyDatabase() => manager.Destroy();
-    public bool StartProcess() => runner.Start();
-    public bool KillProcess() => runner.Kill();
+    RigState InitState() => new()
+    {
+        Connection = manager.Connection,
+        DatabaseCreated = false,
+        ProcessRunning = false        
+    };
+
+    void ResetDbManager(bool dispose = false)
+    {
+        bool restartProcess = State is not null
+            && State.ProcessRunning;
+
+        if (dispose) {
+            runner.Dispose();
+            manager.Dispose();
+        }
+
+        manager = new("App", true, true);
+        runner = new(manager.Connection);
+
+        if (restartProcess)
+            StartProcess();
+    }
+
+    public async Task<RigState> InitializeDatabase()
+    {
+        var result = await manager.InitializeAsync();
+        State.DatabaseCreated = result;
+
+        if (result)            
+            Seeder = new(manager.Context);
+
+        return State;
+    }
+
+    public Task<RigState> DestroyDatabase() => Task.Run(() =>
+    {
+        ResetDbManager(true);
+
+        State.DatabaseCreated = false;
+        State.Connection = manager.Connection;
+
+        return State;
+    });
+
+    public RigState StartProcess()
+    {
+        runner.Start();
+        State.ProcessRunning = runner.Running;
+        return State;
+    }
+
+    public RigState KillProcess()
+    {
+        runner.Kill();
+        State.ProcessRunning = runner.Running;
+        return State;
+    }
 
     public void Dispose()
     {

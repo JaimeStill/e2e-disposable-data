@@ -2,33 +2,43 @@
 <mat-progress-bar *ngIf="loading"
                   color="primary"
                   mode="indeterminate"></mat-progress-bar>
-<section fxLayout="row | wrap"
+<section *ngIf="state"
+         fxLayout="row | wrap"
          fxLayoutAlign="start start"
          fxLayoutGap="8px">
     <section fxLayout="column"
              fxLayoutAlign="start start"
              class="p8">
-        <button-block label="Get Connection String"
-                      [disabled]="loading"
-                      (action)="getConnection()">
-            <p class="m4 word-break-all">
-                {{connection ?? 'No Connection Retrieved'}}
-            </p>
-        </button-block>
         <card>
-            <mat-slide-toggle [disabled]="loading"
+            <p class="m4 mat-body-strong">Connection String</p>
+            <p class="m4 word-break-all">
+                {{state.connection ?? 'No Connection Retrieved'}}
+            </p>
+        </card>
+        <card>
+            <mat-slide-toggle [checked]="state.databaseCreated"
+                              [disabled]="loading"
                               (change)="toggleDatabase()">
-                {{initialized ? 'Destroy Database' : 'Initialize Database'}}
+                {{
+                state.databaseCreated
+                ? 'Destroy Database'
+                : 'Initialize Database'
+                }}
             </mat-slide-toggle>
         </card>
         <card>
-            <mat-slide-toggle [disabled]="loading"
+            <mat-slide-toggle [checked]="state.processRunning"
+                              [disabled]="loading"
                               (change)="toggleProcess()">
-                {{processStarted ? 'Kill Process' : 'Start Process'}}
+                {{
+                state.processRunning
+                ? 'Kill Process'
+                : 'Start Process'
+                }}
             </mat-slide-toggle>
         </card>
         <status-button label="Seed Topic"
-                       [disabled]="loading || topic?.id > 0"
+                       [disabled]="loading || topic?.id > 0 || !(state.databaseCreated) || !(state.processRunning)"
                        [status]="topic?.id > 0"
                        (action)="seedTopic()"></status-button>
     </section>
