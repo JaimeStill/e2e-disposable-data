@@ -16,30 +16,27 @@ public class ApiRig : IDisposable
     public ApiRig(IHubContext<RigHub> socket)
     {
         this.socket = socket;
-        ResetDbManager();
+        ResetDbManager().Wait();
         State = InitState();
     }
 
-    static RigOutput CreateMessage(string message, RigState state, bool error = false, bool exiting = false) =>
-        new()
-        {
-            Exiting = exiting,
-            Output = new RigMessage
-            {
-                IsError = error,
-                Message = message
-            },
-            State = state
-        };
+    async Task Broadcast (string message, bool isError = false) =>
+        await socket
+            .Clients
+            .All
+            .SendAsync("output", new RigOutput { Message = message, IsError = isError });
 
     DataReceivedEventHandler ProcessOutput =>
-        new(async (sender, e) => await socket.Clients.All.SendAsync("output", CreateMessage(e.Data, State)));
+        async (sender, e) => await Broadcast(e.Data );
 
     DataReceivedEventHandler ProcessError =>
-        new(async (sender, e) => await socket.Clients.All.SendAsync("output", CreateMessage(e.Data, State, true)));
+        async (sender, e) => await Broadcast(e.Data, true);
 
     EventHandler ProcessExit =>
-        new(async (sender, e) => await socket.Clients.All.SendAsync("output", CreateMessage("Process exitied", State, false, true)));
+        async (sender, e) => await Broadcast("Process exitied");
+
+    EventHandler<DataSeededEventArgs> ProcessDataSeed =>
+        async (sender, e) => await Broadcast(e.Message);
 
     void RegisterProcessStreams()
     {
@@ -55,7 +52,7 @@ public class ApiRig : IDisposable
         ProcessRunning = false        
     };
 
-    void ResetDbManager(bool dispose = false)
+    async Task ResetDbManager(bool dispose = false)
     {
         bool restartProcess = State is not null
             && State.ProcessRunning;
@@ -70,41 +67,51 @@ public class ApiRig : IDisposable
         RegisterProcessStreams();
 
         if (restartProcess)
-            StartProcess();
+            await StartProcess();
     }
 
     public async Task<RigState> InitializeDatabase()
     {
+        await Broadcast($"Initializing the database at {manager.Connection}...");
+
         var result = await manager.InitializeAsync();
         State.DatabaseCreated = result;
 
-        if (result)            
+        if (result) {
             Seeder = new(manager.Context);
+            Seeder.DataSeeded += ProcessDataSeed;
+            await Broadcast("Database successfully initialized");
+        }
 
         return State;
     }
 
-    public Task<RigState> DestroyDatabase() => Task.Run(() =>
+    public async Task<RigState> DestroyDatabase()
     {
-        ResetDbManager(true);
+        await Broadcast("Destroying the database...");
+        await ResetDbManager(true);
 
         State.DatabaseCreated = false;
         State.Connection = manager.Connection;
+        await Broadcast("Database successfully destroyed");
 
         return State;
-    });
+    }
 
-    public RigState StartProcess()
+    public async Task<RigState> StartProcess()
     {
         runner.Start();
+        await Broadcast($"Process Started: {runner.Process.ProcessName} - {runner.Process.Id}");
         State.ProcessRunning = runner.Running;
         return State;
     }
 
-    public RigState KillProcess()
+    public async Task<RigState> KillProcess()
     {
+        await Broadcast($"Killing process {runner.Process.ProcessName} - {runner.Process.Id}...");
         runner.Kill();
         State.ProcessRunning = runner.Running;
+        await Broadcast("Process successfully killed");
         return State;
     }
 

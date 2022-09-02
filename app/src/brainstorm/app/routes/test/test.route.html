@@ -23,28 +23,16 @@
                         {{state.connection ?? 'No Connection Retrieved'}}
                     </p>
                 </card>
-                <card>
-                    <mat-slide-toggle [checked]="state.databaseCreated"
-                                      [disabled]="loading"
-                                      (change)="toggleDatabase()">
-                        {{
-                        state.databaseCreated
-                        ? 'Destroy Database'
-                        : 'Initialize Database'
-                        }}
-                    </mat-slide-toggle>
-                </card>
-                <card>
-                    <mat-slide-toggle [checked]="state.processRunning"
-                                      [disabled]="loading"
-                                      (change)="toggleProcess()">
-                        {{
-                        state.processRunning
-                        ? 'Kill Process'
-                        : 'Start Process'
-                        }}
-                    </mat-slide-toggle>
-                </card>
+                <toggle-block activeLabel="Destroy Database"
+                              inactiveLabel="Initialize Database"
+                              [active]="state.databaseCreated"
+                              [disabled]="loading"
+                              (slide)="toggleDatabase()"></toggle-block>
+                <toggle-block activeLabel="Kill Process"
+                              inactiveLabel="Start Process"
+                              [active]="state.processRunning"
+                              [disabled]="loading"
+                              (slide)="toggleProcess()"></toggle-block>
                 <status-button label="Seed Topic"
                                [disabled]="loading || topic?.id > 0 || !(state.databaseCreated) || !(state.processRunning)"
                                [status]="topic?.id > 0"
@@ -52,15 +40,5 @@
             </section>
             <pre class="p8 m8"><code class="color-green">{{topic | json}}</code></pre>
         </section>
-        <section class="p8"
-                 [style.height.px]="240"
-                 [style.font-family]="'consolas'">
-            <ng-container *ngIf="socket.output?.length > 0">
-                <p *ngFor="let o of socket.output"
-                   class="m4">{{o.output.message}}</p>
-            </ng-container>
-            <p *ngIf="!(socket.output?.length > 0)"
-               class="m4">No Output Available</p>
-        </section>
+        <console [messages]="socket.output"></console>
     </section>
-</section>

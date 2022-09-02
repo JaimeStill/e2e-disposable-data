@@ -1,5 +1,4 @@
 import {
-    HttpTransportType,
     HubConnection,
     HubConnectionBuilder
 } from '@microsoft/signalr';

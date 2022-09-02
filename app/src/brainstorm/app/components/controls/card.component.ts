@@ -9,4 +9,5 @@ import {
 })
 export class CardComponent {
     @Input() width = 360;
+    @Input() alignment = 'center start';
 }

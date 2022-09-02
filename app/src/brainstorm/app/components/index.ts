@@ -1,9 +1,7 @@
-import { ButtonBlockComponent } from './button-block.component';
-import { CardComponent } from './card.component';
-import { StatusButtonComponent } from './status-button.component';
+import { ControlComponents } from './controls';
+import { LayoutComponents } from './layout';
 
 export const Components = [
-    ButtonBlockComponent,
-    CardComponent,
-    StatusButtonComponent
+    ...ControlComponents,
+    ...LayoutComponents
 ];

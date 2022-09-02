@@ -1,7 +1,6 @@
 namespace Brainstorm.Rig.Models;
 public struct RigOutput
 {
-    public RigState State { get; set; }
-    public RigMessage Output { get; set; }
-    public bool Exiting { get; set; }    
+    public string Message { get; set; }
+    public bool IsError { get; set; }
 }

@@ -1,0 +1,12 @@
+<card alignment="center start"
+      [width]="width">
+    <mat-slide-toggle [checked]="active"
+                      [disabled]="disabled"
+                      (change)="slide.emit()">
+        {{
+        active
+        ? activeLabel
+        : inactiveLabel
+        }}
+    </mat-slide-toggle>
+</card>

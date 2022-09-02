@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 
 import {
     Rig,
+    RigOutput,
     RigSocket,
     RigState
 } from '../../../../rig';
