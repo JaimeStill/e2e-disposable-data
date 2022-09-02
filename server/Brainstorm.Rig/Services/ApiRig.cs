@@ -28,7 +28,8 @@ public class ApiRig : IDisposable
             && State.ProcessRunning;
 
         if (dispose) {
-            runner.Kill();
+            runner.Dispose();
+            manager.Dispose();
         }
 
         manager = new("App", true, true);
@@ -49,17 +50,15 @@ public class ApiRig : IDisposable
         return State;
     }
 
-    public async Task<RigState> DestroyDatabase()
+    public Task<RigState> DestroyDatabase() => Task.Run(() =>
     {
-        var result = await manager.Destroy();
+        ResetDbManager(true);
 
-        if (result)
-            ResetDbManager(true);
-
+        State.DatabaseCreated = false;
         State.Connection = manager.Connection;
 
         return State;
-    }
+    });
 
     public RigState StartProcess()
     {

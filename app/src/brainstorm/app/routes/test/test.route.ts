@@ -33,7 +33,7 @@ export class TestRoute {
         id: 0,
         url: null,
         name: 'TypeScript Rig',
-        description: 'Posted from TypeScript Rig client service',
+        description: 'Posted from TypeScript Rig client',
         notes: [
             {
                 title: 'Rig Note',
