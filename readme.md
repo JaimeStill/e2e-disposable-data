@@ -4,10 +4,14 @@
 
 Given a .NET 6 API and an Angular app, create an API-accessible server that allows a client service to initialize data state from a client service and run the API server pointed to this data to facilitate Cypress tests.
 
+https://user-images.githubusercontent.com/14102723/188249836-c5e70ac9-ba28-4851-8f1f-47cdebaea7e7.mp4
+
 ## Current Features
 
 1. Initialization of a unique test database instance:
     * Generates a unique connection string and applies all migrations to the target database instance.
+
+    * Ability to destroy and re-initialize with a new database.
 
 2. Start the API server project in a managed process.
 
