@@ -1,16 +1,15 @@
 <section fxLayout="column"
          fxLayoutAlign="start stretch"
-         [style.height.%]="100">
+         class="full-height">
     <p class="mat-title m8">Test Rig API</p>
     <mat-progress-bar *ngIf="loading"
                       color="primary"
                       mode="indeterminate"></mat-progress-bar>
-    <section *ngIf="socket"
+    <section *ngIf="socket && state"
              fxLayout="column"
              fxLayoutAlign="start stretch"
              fxFlex>
-        <section *ngIf="state"
-                 fxLayout="row | wrap"
+        <section fxLayout="row | wrap"
                  fxLayoutAlign="start start"
                  fxLayoutGap="8px"
                  fxFlex>
@@ -42,3 +41,4 @@
         </section>
         <console [messages]="socket.output"></console>
     </section>
+</section>
