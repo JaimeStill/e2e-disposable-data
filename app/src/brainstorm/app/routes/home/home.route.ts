@@ -1,16 +1,33 @@
 import {
-  Component,
-  OnInit
+    Component,
+    OnDestroy,
+    OnInit
 } from '@angular/core';
 
-@Component({
-  selector: 'home-route',
-  templateUrl: 'home.route.html'
-})
-export class HomeRoute implements OnInit {
-  constructor(
-  ) { }
+import {
+    QuerySource,
+    Topic
+} from '../../models';
 
-  ngOnInit() {
-  }
+import { TopicApi } from '../../services';
+
+@Component({
+    selector: 'home-route',
+    templateUrl: 'home.route.html',
+    providers: [TopicApi]
+})
+export class HomeRoute implements OnInit, OnDestroy {
+    topicSrc: QuerySource<Topic>;
+
+    constructor(
+         public topicApi: TopicApi
+    ) { }
+
+    ngOnInit(): void {
+        this.topicSrc = this.topicApi.query();
+    }
+
+    ngOnDestroy(): void {
+        this.topicSrc.unsubscribe();
+    }
 }

@@ -1,1 +1,12 @@
-<p class="mat-title m8">Home</p>
+<ng-template #loading>
+    <mat-progress-bar mode="indeterminate"
+                      color="accent"></mat-progress-bar>
+</ng-template>
+<ng-container *ngIf="topicSrc.result$ | async as query else loading">
+    <async-source searchLabel="Search Topics"
+                  emptyLabel="No Topics Available"
+                  [src]="topicSrc">
+        <topic-card *ngFor="let topic of query.data"
+                    [topic]="topic"></topic-card>
+    </async-source>
+</ng-container>

@@ -123,8 +123,6 @@ export abstract class CoreQuery<T> {
     }
 
     refresh = (repage: boolean = false) => {
-        this.clear();
-
         if (!this.baseUrl || !this.endpoint) {
             this.url.next(null);
             return;
@@ -142,7 +140,9 @@ export abstract class CoreQuery<T> {
             url.searchParams.set('sort', `${this.sort.propertyName}_${this.sort.isDescending ? 'desc' : 'asc'}`);
 
         if (this.search)
-            url.searchParams.set('search', this.search);
+            url.searchParams.set('search', this.search)
+        else
+            url.searchParams.delete('search');
 
         for (const name in this._additionalQueryParams) {
             if (this._additionalQueryParams.hasOwnProperty(name)) {
