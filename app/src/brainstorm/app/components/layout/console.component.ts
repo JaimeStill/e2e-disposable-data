@@ -17,7 +17,7 @@ interface ConsoleMessage {
     styleUrls: ['console.component.scss']
 })
 export class ConsoleComponent implements AfterViewChecked {
-    @Input() height: number = 300;
+    @Input() height: number = 250;
     @Input() expanded: boolean = true;
     @Input() consoleStyle: string = 'p8';
     @Input() messageStyle: string = 'm4';

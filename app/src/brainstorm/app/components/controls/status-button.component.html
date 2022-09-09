@@ -1,9 +1,17 @@
-<button-block [label]="label"
-              [disabled]="disabled"
-              [width]="width"
-              (action)="action.emit()">
-    <mat-icon *ngIf="status"
-              class="color-green m4">check_circle</mat-icon>
-    <mat-icon *ngIf="!(status)"
-              class="color-red m4">warning</mat-icon>
-</button-block>
+<card alignment="start stretch"
+      [width]="width">
+    <section [fxLayout]="layout"
+             [fxLayoutAlign]="alignment">
+        <button mat-stroked-button
+                class="m4"
+                [disabled]="disabled"
+                (click)="action.emit()">
+            {{label}}
+        </button>
+        <mat-icon *ngIf="status"
+                  class="color-green m4">check_circle</mat-icon>
+        <mat-icon *ngIf="!(status)"
+                  class="color-red m4">warning</mat-icon>
+    </section>
+    <ng-content></ng-content>
+</card>

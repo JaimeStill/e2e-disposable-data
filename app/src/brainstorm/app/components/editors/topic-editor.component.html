@@ -1,0 +1,25 @@
+<section fxLayout="column"
+         fxLayoutAlign="start stretch"
+         class="p8 rounded card-outline-accent"
+         [style.width.px]="size">
+    <topic-form class="m4"
+                [data]="form"
+                (add)="addNote()"
+                (remove)="removeNote($event)"></topic-form>
+    <section fxLayout="row"
+             fxLayoutAlign="end center"
+             fxLayoutGap="16px"
+             class="p8">
+        <button mat-stroked-button
+                [disabled]="!(storage.hasState)"
+                (click)="clearStorage()">
+            Clear Cache
+        </button>
+        <button mat-stroked-button
+                class="color-primary"
+                [disabled]="form?.invalid"
+                (click)="save()">
+            Save Topic
+        </button>
+    </section>
+</section>

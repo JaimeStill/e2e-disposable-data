@@ -1,1 +1,29 @@
-<p class="mat-title m8">Home</p>
+<ng-template #loading>
+    <mat-progress-bar mode="indeterminate"
+                      color="accent"></mat-progress-bar>
+</ng-template>
+<section fxLayout="row | wrap"
+         fxLayoutAlign="start start"
+         fxLayoutGap="8px">
+    <async-source searchLabel="Search Topics"
+                  emptyLabel="No Topics Available"
+                  layout="column"
+                  alignment="start stretch"
+                  [inlineControls]="false"
+                  [src]="topicSrc">
+        <ng-container *ngIf="topicSrc.result$ | async as query else loading">
+            <topic-card *ngFor="let t of query.data"
+                        [topic]="t"
+                        [selected]="topic?.id === t.id"
+                        (edit)="selectTopic($event)"
+                        (remove)="removeTopic($event)"></topic-card>
+        </ng-container>
+    </async-source>
+    <section fxLayout="column"
+             fxLayoutAlign="start stretch"
+             fxFlex>
+        <topic-editor class="m4"
+                      [data]="topic"
+                      (update)="refresh($event)"></topic-editor>
+    </section>
+</section>

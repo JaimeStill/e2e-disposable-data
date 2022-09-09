@@ -13,6 +13,7 @@ import { AppComponent } from './app.component';
 
 import { Components } from './components';
 import { Dialogs } from './dialogs';
+import { Forms } from './forms';
 
 import {
   RouteComponents,
@@ -24,6 +25,7 @@ import {
     AppComponent,
     ...Components,
     ...Dialogs,
+    ...Forms,
     ...RouteComponents
   ],
   imports: [

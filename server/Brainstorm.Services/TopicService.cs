@@ -16,6 +16,9 @@ public class TopicService : ServiceBase<Topic>
                 || x.Notes.Any(n => n.Title.ToLower().Contains(term.ToLower()))
             );
 
+    protected override IQueryable<Topic> SetGraph(DbSet<Topic> data) =>
+        data.Include(x => x.Notes);
+
     public async Task<bool> ValidateName(Topic topic) =>
         !await set.AnyAsync(x =>
             x.Id != topic.Id

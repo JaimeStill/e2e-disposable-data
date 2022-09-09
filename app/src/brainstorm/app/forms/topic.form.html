@@ -1,0 +1,68 @@
+<form [formGroup]="form">
+    <section fxLayout="column"
+             fxLayoutAlign="start stretch">
+        <mat-form-field class="my4">
+            <mat-label>Name</mat-label>
+            <input formControlName="name"
+                   matInput>
+            <mat-error *ngIf="name?.errors?.required">Name is required</mat-error>
+            <mat-error *ngIf="name?.errors?.api">Name is already in use</mat-error>
+        </mat-form-field>
+        <mat-form-field class="my4">
+            <textarea formControlName="description"
+                      matInput
+                      cdkTextareaAutosize
+                      [cdkAutosizeMinRows]="4"
+                      [cdkAutosizeMaxRows]="4"></textarea>
+        </mat-form-field>
+    </section>
+    <section formArrayName="notes"
+             fxLayout="column"
+             fxLayoutAlign="start stretch">
+        <section fxLayout="row"
+                 fxLayoutAlign="space-between center">
+            <p class="m4 mat-subheading-2 bold">Notes</p>
+            <button mat-icon-button
+                    class="color-primary"
+                    (click)="add.emit()">
+                <mat-icon>add_circle_outline</mat-icon>
+            </button>
+        </section>
+        <section class="m4 p8 rounded card-outline-accent"
+                 *ngFor="let note of notes.controls; let i = index"
+                 fxLayout="column"
+                 fxLayoutAlign="start stretch"
+                 [formGroupName]="i">
+            <mat-form-field class="my4">
+                <mat-label>Title</mat-label>
+                <input formControlName="title"
+                       matInput>
+                <mat-error *ngIf="note.get('title')?.errors?.required">Title is required</mat-error>
+            </mat-form-field>
+            <section fxLayout="row"
+                     fxLayoutAlign="start center"
+                     fxLayoutGap="8px"
+                     class="my4 p4">
+                <span>Priority</span>
+                <mat-slider formControlName="priority"
+                            fxFlex
+                            [min]="0"
+                            [max]="5"
+                            [step]="1"
+                            [thumbLabel]="true"></mat-slider>
+                <span>{{note.get('priority').value}}</span>
+            </section>
+            <mat-form-field class="my4">
+                <mat-label>Body</mat-label>
+                <textarea formControlName="body"
+                          matInput
+                          cdkTextareaAutosize
+                          [cdkAutosizeMinRows]="4"
+                          [cdkAutosizeMaxRows]="4"></textarea>
+            </mat-form-field>
+            <button mat-stroked-button
+                    class="color-warn my4"
+                    (click)="remove.emit(i)">Remove Note</button>
+        </section>
+    </section>
+</form>
