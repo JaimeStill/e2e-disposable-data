@@ -1,5 +1,5 @@
 import { TopicEditorComponent } from './topic-editor.component';
 
-export const TopicComponents = [
+export const EditorComponents = [
     TopicEditorComponent
 ];

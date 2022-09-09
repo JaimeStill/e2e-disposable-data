@@ -2,15 +2,11 @@ import { Component } from '@angular/core';
 
 import {
     Rig,
-    RigOutput,
     RigSocket,
     RigState
 } from '../../../../rig';
 
-import {
-    Note,
-    Topic
-} from '../../models';
+import { Topic } from '../../models';
 
 @Component({
     selector: 'test-route',
@@ -21,6 +17,23 @@ export class TestRoute {
     state: RigState;
     socket: RigSocket;
     loading: boolean = true;
+    topic: Topic;
+
+    topicSeed: Topic = {
+        id: 0,
+        url: null,
+        name: 'TypeScript Rig',
+        description: 'Seeded from TypeScript Rig client'
+    } as Topic;
+
+    private new = () => {
+        return {
+            id: 0,
+            name: '',
+            url: '',
+            description: ''
+        } as Topic;
+    }
 
     private init = async () => {
         this.state = await this.rig.getState();
@@ -29,21 +42,9 @@ export class TestRoute {
     }
 
     constructor() {
+        this.topic = this.new();
         this.init();
         this.socket = new RigSocket();
-    }
-
-    topic: Topic = {
-        id: 0,
-        url: null,
-        name: 'TypeScript Rig',
-        description: 'Posted from TypeScript Rig client',
-        notes: [
-            {
-                title: 'Rig Note',
-                body: 'Note generated from within a Topic'
-            } as Note
-        ]
     }
 
     private initializeDatabase = async () => {
@@ -82,10 +83,12 @@ export class TestRoute {
         ? this.killProcess()
         : this.startProcess();
 
+    seeded = () => this.topic = this.new();
+
     seedTopic = async () => {
         this.loading = true;
-        this.topic = await this.rig.seed(this.topic, 'seedTopic');
-        console.table(this.topic);
+        this.topicSeed = await this.rig.seed(this.topicSeed, 'seedTopic');
+        console.table(this.topicSeed);
         this.loading = false;
     }
 }

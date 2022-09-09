@@ -1,0 +1,45 @@
+<card padding="0">
+    <section fxLayout="row"
+             fxLayoutAlign="start stretch">
+        <section class="p8"
+                 fxLayout="column"
+                 fxLayoutAlign="space-between stretch"
+                 fxFlex>
+            <p class="m4 mat-body-strong">{{topic?.name}}</p>
+            <p class="m4">{{topic?.url}}</p>
+            <p class="m4">{{topic?.description}}</p>
+        </section>
+        <section fxLayout="column"
+                 fxLayoutAlign="space-between center"
+                 class="p4 rounded-right">
+            <button mat-icon-button
+                    (click)="edit.emit(topic)">
+                <mat-icon *ngIf="selected"
+                          color="primary">radio_button_checked</mat-icon>
+                <mat-icon *ngIf="!(selected)">radio_button_unchecked</mat-icon>
+            </button>
+            <button mat-icon-button
+                    color="warn"
+                    (click)="remove.emit(topic)">
+                <mat-icon>delete_outline</mat-icon>
+            </button>
+        </section>
+    </section>
+    <mat-divider></mat-divider>
+    <section fxLayout="row"
+             fxLayoutAlign="space-between center"
+             class="p4">
+        <p class="m4 mat-body-strong">Notes</p>
+        <button mat-icon-button
+                (click)="toggleExpanded()">
+            <mat-icon *ngIf="expanded">keyboard_arrow_down</mat-icon>
+            <mat-icon *ngIf="!(expanded)">keyboard_arrow_right</mat-icon>
+        </button>
+    </section>
+    <section *ngIf="expanded"
+             fxLayout="column"
+             fxLayoutAlign="start stretch">
+        <note-card *ngFor="let note of topic?.notes"
+                   [note]="note"></note-card>
+    </section>
+</card>

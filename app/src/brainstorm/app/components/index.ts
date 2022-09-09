@@ -1,9 +1,11 @@
+import { CardComponents } from './cards';
 import { ControlComponents } from './controls';
+import { EditorComponents } from './editors';
 import { LayoutComponents } from './layout';
-import { TopicComponents } from './topic';
 
 export const Components = [
+    ...CardComponents,
     ...ControlComponents,
-    ...LayoutComponents,
-    ...TopicComponents
+    ...EditorComponents,
+    ...LayoutComponents
 ];

@@ -38,7 +38,7 @@ export class TopicEditorComponent {
 
     @Input() label = 'Topic';
     @Input() size = 420;
-    @Output() update = new EventEmitter();
+    @Output() update = new EventEmitter<Topic>();
 
     constructor(
         private fb: FormBuilder,
@@ -100,7 +100,7 @@ export class TopicEditorComponent {
 
             if (res) {
                 this.clearStorage();
-                this.update.emit();
+                this.update.emit(res);
             }
         }
     }

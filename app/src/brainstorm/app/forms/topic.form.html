@@ -42,14 +42,15 @@
             <section fxLayout="row"
                      fxLayoutAlign="start center"
                      fxLayoutGap="8px"
-                     class="my4">
+                     class="my4 p4">
                 <span>Priority</span>
                 <mat-slider formControlName="priority"
-                            [min]="min"
-                            [max]="max"
-                            [step]="step"
+                            fxFlex
+                            [min]="0"
+                            [max]="5"
+                            [step]="1"
                             [thumbLabel]="true"></mat-slider>
-                <span>{{note.get('priority')}}</span>
+                <span>{{note.get('priority').value}}</span>
             </section>
             <mat-form-field class="my4">
                 <mat-label>Body</mat-label>

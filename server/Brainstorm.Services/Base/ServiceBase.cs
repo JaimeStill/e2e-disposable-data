@@ -10,14 +10,18 @@ public class ServiceBase<T> : IService<T> where T : EntityBase
 {
     protected AppDbContext db;
     protected DbSet<T> set;
+    protected IQueryable<T> query;
 
     public ServiceBase(AppDbContext db)
     {
         this.db = db;
         set = db.Set<T>();
+        query = SetGraph(set);
     }
 
     protected virtual Func<IQueryable<T>, string, IQueryable<T>> Search => (values, term) => values;
+
+    protected virtual IQueryable<T> SetGraph(DbSet<T> data) => data;
 
     protected virtual async Task<QueryResult<T>> Query(
         IQueryable<T> queryable,
@@ -64,14 +68,14 @@ public class ServiceBase<T> : IService<T> where T : EntityBase
     
     public virtual async Task<QueryResult<T>> Query(QueryParams queryParams) =>
         await Query(
-            set, queryParams, Search
+            query, queryParams, Search
         );
 
     public virtual async Task<T> GetById(int id) =>
-        await set.FindAsync(id);
+        await query.FirstOrDefaultAsync(x => x.Id == id);
 
     public virtual async Task<T> GetByUrl(string url) =>
-        await set.FirstOrDefaultAsync(x => x.Url.ToLower() == url.ToLower());
+        await query.FirstOrDefaultAsync(x => x.Url.ToLower() == url.ToLower());
 
     public virtual Task<bool> Validate(T entity) => Task.FromResult(true);
 

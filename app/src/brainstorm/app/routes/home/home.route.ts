@@ -5,11 +5,12 @@ import {
 } from '@angular/core';
 
 import {
-    Note,
     QuerySource,
     Topic
 } from '../../models';
 
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDialog } from '../../dialogs';
 import { TopicApi } from '../../services';
 
 @Component({
@@ -22,7 +23,8 @@ export class HomeRoute implements OnInit, OnDestroy {
     topicSrc: QuerySource<Topic>;
 
     constructor(
-         public topicApi: TopicApi
+        private dialog: MatDialog,
+        public topicApi: TopicApi
     ) { }
 
     private new = () => {
@@ -43,5 +45,36 @@ export class HomeRoute implements OnInit, OnDestroy {
         this.topicSrc.unsubscribe();
     }
 
-    refresh = () => this.topicSrc.refresh(true);
+    refresh = (topic: Topic) => {
+        this.topic = topic;
+        this.topicSrc.refresh(true);
+    }
+
+    selected = (topic: Topic) => topic.id === this.topic.id;
+
+    selectTopic = (topic: Topic) =>
+        this.topic = this.selected(topic)
+            ? this.new()
+            : topic;
+
+    removeTopic = (topic: Topic) => this.dialog.open(ConfirmDialog, {
+        data: {
+            title: 'Remove Topic',
+            content: `Are you sure you want to remove Topic ${topic.name}?`
+        },
+        autoFocus: false,
+        disableClose: true
+    })
+    .afterClosed()
+    .subscribe(async (result: boolean) => {
+        if (result) {
+            const res = await this.topicApi.remove(topic);
+
+            if (res) {
+                this.selected(topic)
+                    ? this.refresh(this.new())
+                    : this.topicSrc.refresh(true);
+            }
+        }
+    })
 }

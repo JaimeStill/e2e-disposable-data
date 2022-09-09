@@ -33,11 +33,17 @@
                               [disabled]="loading"
                               (slide)="toggleProcess()"></toggle-block>
                 <status-button label="Seed Topic"
-                               [disabled]="loading || topic?.id > 0 || !(state.databaseCreated) || !(state.processRunning)"
-                               [status]="topic?.id > 0"
-                               (action)="seedTopic()"></status-button>
+                               [disabled]="loading || topicSeed?.id > 0 || !(state.databaseCreated) || !(state.processRunning)"
+                               [status]="topicSeed?.id > 0"
+                               (action)="seedTopic()">
+                    <pre class="p8 m8 pre-wrap"><code [class]="topicSeed?.id > 0 ? 'color-green' : 'color-red'">{{topicSeed | json}}</code></pre>
+                </status-button>
             </section>
-            <pre class="p8 m8"><code class="color-green">{{topic | json}}</code></pre>
+            <ng-container *ngIf="state.databaseCreated && state.processRunning">
+                <topic-editor class="m8"
+                              [data]="topic"
+                              (update)="seeded()"></topic-editor>
+            </ng-container>
         </section>
         <console [messages]="socket.output"></console>
     </section>

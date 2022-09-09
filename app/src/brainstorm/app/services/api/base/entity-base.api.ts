@@ -77,6 +77,6 @@ export abstract class EntityBaseApi<T extends EntityBase> {
 
     remove = (entity: T): Promise<boolean> =>
         firstValueFrom(
-            this.http.post<boolean>(`${this.api}remove`, entity)
+            this.http.delete<boolean>(`${this.api}remove`, { body: entity })
         );
 }
