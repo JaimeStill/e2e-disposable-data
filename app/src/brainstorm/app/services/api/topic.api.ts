@@ -1,9 +1,14 @@
+import {
+    IStorage,
+    SessionStorage,
+    Topic
+} from '../../models';
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { QueryGeneratorService } from '../core';
 import { EntityBaseApi } from './base';
-import { Topic } from '../../models';
 
 @Injectable({
     providedIn: 'root'
@@ -15,6 +20,9 @@ export class TopicApi extends EntityBaseApi<Topic> {
     ) {
         super('topic', generator, http);
     }
+
+    generateStorage = (topic: Topic): IStorage<Topic> =>
+        new SessionStorage<Topic>(topic?.id ? `brainstorm-topic-${topic.id}` : `brainstorm-topic-new`);
 
     validateName = (topic: Topic): Promise<boolean> =>
         firstValueFrom(

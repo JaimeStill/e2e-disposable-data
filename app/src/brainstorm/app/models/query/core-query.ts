@@ -45,7 +45,7 @@ export abstract class CoreQuery<T> {
         protected initialPageSize: number = 20,
         public pageSizeOptions: number[] = [5, 10, 20, 50, 100]
     ) {
-        this.pageSize = initialPageSize;
+        this._pageSize = initialPageSize;
         this.sub = this.initUrl();
     }
 
@@ -109,25 +109,7 @@ export abstract class CoreQuery<T> {
         }
     }
 
-    protected _additionalQueryParams: { [parameter: string]: string } = {};
-    setQueryParameter(name: string, value: string | null) {
-        if (value)
-            this._additionalQueryParams[name] = value;
-        else if (this._additionalQueryParams[name])
-            delete (this._additionalQueryParams[name]);
-
-        this.refresh(true);
-    }
-    getQueryParameter(parameterName: string): string | null {
-        return this._additionalQueryParams[parameterName] || null;
-    }
-
     refresh = (repage: boolean = false) => {
-        if (!this.baseUrl || !this.endpoint) {
-            this.url.next(null);
-            return;
-        }
-
         const url = new URL(this.endpoint, this.baseUrl);
 
         if (repage)
@@ -138,26 +120,17 @@ export abstract class CoreQuery<T> {
 
         if (this.sort)
             url.searchParams.set('sort', `${this.sort.propertyName}_${this.sort.isDescending ? 'desc' : 'asc'}`);
+        else
+            url.searchParams.delete('sort');
 
         if (this.search)
             url.searchParams.set('search', this.search)
         else
             url.searchParams.delete('search');
 
-        for (const name in this._additionalQueryParams) {
-            if (this._additionalQueryParams.hasOwnProperty(name)) {
-                const value = this._additionalQueryParams[name];
-
-                if (value)
-                    url.searchParams.set(name, value);
-            }
-        }
-
         this.url.next(url);
         this._endpoint = url.toString();
     }
-
-    clear = () => this.result.next(null);
 
     onPage = (pageEvent: PageEvent) => {
         this.page = pageEvent.pageIndex + 1;

@@ -2,11 +2,18 @@
     <mat-progress-bar mode="indeterminate"
                       color="accent"></mat-progress-bar>
 </ng-template>
-<ng-container *ngIf="topicSrc.result$ | async as query else loading">
+<section fxLayout="column"
+         fxLayoutAlign="start stretch"
+         fxLayoutGap="8px">
+    <topic-editor class="m4"
+                  [data]="topic"
+                  (update)="refresh()"></topic-editor>
     <async-source searchLabel="Search Topics"
                   emptyLabel="No Topics Available"
                   [src]="topicSrc">
-        <topic-card *ngFor="let topic of query.data"
-                    [topic]="topic"></topic-card>
+        <ng-container *ngIf="topicSrc.result$ | async as query else loading">
+            <topic-card *ngFor="let topic of query.data"
+                        [topic]="topic"></topic-card>
+        </ng-container>
     </async-source>
-</ng-container>
+</section>
