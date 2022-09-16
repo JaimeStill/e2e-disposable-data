@@ -9,6 +9,7 @@
             <mat-error *ngIf="name?.errors?.api">Name is already in use</mat-error>
         </mat-form-field>
         <mat-form-field class="my4">
+            <mat-label>Description</mat-label>
             <textarea formControlName="description"
                       matInput
                       cdkTextareaAutosize
