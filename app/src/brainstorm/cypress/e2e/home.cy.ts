@@ -43,7 +43,9 @@ describe('Brainstorm Tests', () => {
 
     it('Test the Brainstorm module', () => {
         cy.visit('/')
-            .contains('Brainstorm')
+            .contains('Brainstorm');
+
+        cy.wait(3000)
             .screenshot('brainstorm', {
                 capture: "fullPage"
             });
