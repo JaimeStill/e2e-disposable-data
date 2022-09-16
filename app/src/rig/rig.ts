@@ -6,6 +6,12 @@ import { RigState } from './rig-state';
 
 export class Rig {
     protected readonly baseUrl: string;
+    protected get = async (endpoint: string): Promise<any> => (
+        await fetch(endpoint, {
+            credentials: 'include'
+        })
+    ).json();
+
     protected post = async (endpoint: string, data: string): Promise<any> => (
         await fetch(endpoint, {
             method: 'POST',
@@ -13,6 +19,7 @@ export class Rig {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
+            credentials: 'include',
             body: data
         })
     ).json();
@@ -24,19 +31,19 @@ export class Rig {
     }
 
     getState = async (): Promise<RigState> =>
-        (await fetch(`${this.baseUrl}getState`)).json();
+        await this.get(`${this.baseUrl}getState`);
 
     initializeDatabase = async (): Promise<RigState> =>
-        (await fetch(`${this.baseUrl}initializeDatabase`)).json();
+        await this.get(`${this.baseUrl}initializeDatabase`);
 
     destroyDatabase = async (): Promise<RigState> =>
-        (await fetch(`${this.baseUrl}destroyDatabase`)).json();
+        await this.get(`${this.baseUrl}destroyDatabase`);
 
     startProcess = async (): Promise<RigState> =>
-        (await fetch(`${this.baseUrl}startProcess`)).json();
+        await this.get(`${this.baseUrl}startProcess`);
 
     killProcess = async (): Promise<RigState> =>
-        (await fetch(`${this.baseUrl}killProcess`)).json();
+        await this.get(`${this.baseUrl}killProcess`);
 
     seed = async <T extends EntityBase>(entity: T, endpoint: string) =>
         this.post(`${this.baseUrl}${endpoint}`, JSON.stringify(entity));
