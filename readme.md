@@ -7,11 +7,13 @@
 * [Rig Server API Walkthrough](#rig-server-api-walkthrough)
 * [Notes](#notes)
     * [SQL Server Express](#sql-server-express)
+    * [Cypress Configuration](#cypress-configuration)
+    * [Cypress Asynchronous Tasks](#cypress-asynchronous-tasks)
 
 ## Overview
 [Back to Top](#cypress-testing-with-disposable-data-api)
 
-Given a .NET 6 API and an Angular app, create an API-accessible server that allows a client service to initialize disposable data state from a client service. When executing Cypress tests, the data state can be initialized before all tests are run, then disposed of after all tests are completed.
+Given a .NET 6 API using EF Core with SQL Server and a web client, create an API-accessible server that allows a client service to initialize disposable data state from a client service. When executing Cypress tests, the data state can be initialized before all tests are run, then disposed of after all tests are completed.
 
 https://user-images.githubusercontent.com/14102723/188249836-c5e70ac9-ba28-4851-8f1f-47cdebaea7e7.mp4
 
@@ -74,11 +76,62 @@ https://user-images.githubusercontent.com/14102723/190687828-46580be2-e3ad-4a99-
 ### SQL Server Express
 [Back to Top](#cypress-testing-with-disposable-data-api)
 
-Testing environment runs using [SQL Server 2019 Express](https://go.microsoft.com/fwlink/p/?linkid=866658) with the server name of `DevSql`.
+Testing environment runs using [SQL Server 2019 Express](https://go.microsoft.com/fwlink/p/?linkid=866658) with the server name of `DevSql` and Windows authentication.
 
-Additionally, in SQL Server Management Studio, *cross database ownership chaining* is enabled in *Server Properties (right-click the server and click **Properties**) > Security tab > Options section*.
+In SQL Server Management Studio,right-click the server in object explorer and click **Properties**:
+
+* In the **Security** tab, *cross database ownership chaining* is enabled:
+
+    ![image](https://user-images.githubusercontent.com/14102723/190693425-b43870c4-260f-4959-846f-9fb9834972a9.png)
+
+* In the **Advanced** tab, *Enable Contained Databases* is set to `True`:
+
+    ![image](https://user-images.githubusercontent.com/14102723/190693591-28feb0a0-a66b-4e40-bc3e-ad922601c9e6.png)
 
 Additional Links:
 * [SQL Server Management Studio](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver16)
 * [SQL Server 2019 Cumulative Update](https://support.microsoft.com/en-us/topic/kb5016394-cumulative-update-17-for-sql-server-2019-3033f654-b09d-41aa-8e49-e9d0c353c5f7)
 
+### Cypress Configuration
+
+[**cypress.config.ts**](./app/src/brainstorm/cypress.config.ts)
+
+* `baseUrl: http://localhost:3000` - Required to prevent re-calling the `before` and `after` methods when `cy.visit()` is executed.
+
+* `defaultCommandTimeout: 8000` - Give a larger buffer for API method execution, particularly when executing `rig.startProcess()`.
+
+[**tsconfig.json**](./app/src/brainstorm/cypress/tsconfig.json)
+
+The following settings are required to be able to use the external [Rig](./app/src/rig/rig.ts) client within tests:
+
+```json
+{
+    "compilerOptions": {
+        "target": "ES5",
+        "lib": ["ES5", "DOM"],
+        "types": [
+            "cypress",
+            "node"
+        ]
+    }
+}
+```
+
+### Cypress Asynchronous Tasks
+[Back to Top](#cypress-testing-with-disposable-data-api)
+
+Cypress does not support using [async / await in tests](https://github.com/cypress-io/cypress/issues/1417) and internally handles asynchrony in non-standard ways. Because of this, when executing asyncronous tasks with non-Cypress infrastructure, these calls have to be wrapped in `cy.then(() => )` and resolved with its own `.then(() => )` call. For instance, when initializing the database before executing tests, the following structure must be used within a test:
+
+```ts
+// before all tests execute
+before(() => {
+    // initialize an asynchronous action with Cypress
+    cy.then(() =>
+        // execute an external Promise
+        rig.initializeDatabase().then(() =>
+            // log once the promise completes.
+            cy.log('Database initialized')
+        )
+    );
+})
+```

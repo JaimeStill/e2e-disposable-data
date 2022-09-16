@@ -12,7 +12,6 @@ export default defineConfig({
             overwrite: false,
             html: false,
             json: true
-        },
-        chromeWebSecurity: false
+        }
     }
 })
