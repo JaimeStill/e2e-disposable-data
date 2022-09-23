@@ -1,7 +1,5 @@
 # Cypress Testing with Disposable Data API
 
-> Still a work in progress.
-
 * [Overview](#overview)
 * [Relevant Infrastructure](#relevant-infrastructure)
 * [Walkthroughs](#walkthroughs)
