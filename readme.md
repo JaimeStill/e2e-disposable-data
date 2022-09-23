@@ -7,7 +7,6 @@
 * [Walkthroughs](#walkthroughs)
     * [Cypress Walkthrough](#cypress-walkthrough)
     * [Angular Rig Test Walkthrough](#angular-rig-test-walkthrough)
-    * [Rig Server API Walkthrough](#rig-server-api-walkthrough)
 * [Notes](#notes)
     * [SQL Server Express](#sql-server-express)
     * [Cypress Configuration](#cypress-configuration)
@@ -16,11 +15,24 @@
 ## Overview
 [Back to Top](#cypress-testing-with-disposable-data-api)
 
-Given a .NET 6 API using EF Core with SQL Server and a web client, create an API-accessible server that allows a client service to initialize disposable data state from a client service. When executing Cypress tests, the data state can be initialized before all tests are run, then disposed of after all tests are completed.
+Given a .NET 6 API using EF Core with SQL Server and a web client, create an API-accessible server that allows a client service to initialize disposable data state from a client service. I refer to this end to end infrastructure as a data rig. When executing Cypress tests, the data state can be initialized before all tests are run and attached to a disposable instance of an app's API server, then disposed of after all tests are completed.
 
-https://user-images.githubusercontent.com/14102723/190814410-96f3d5d9-3098-44b0-9d20-aa75142303c4.mp4
+The following demonstrates testing out the Rig API and client service via an Angular testing interface:  
 
 https://user-images.githubusercontent.com/14102723/188249836-c5e70ac9-ba28-4851-8f1f-47cdebaea7e7.mp4
+
+The following demonstrates using the Rig to:
+
+* Before All:
+    * Initialize a disposable database
+    * Start a disposable app API process
+    * Seed initial state data into the database
+* Execute Cypress Tests
+* After All:
+    * Kill app API Process
+    * Destroy disposable database
+
+https://user-images.githubusercontent.com/14102723/190814410-96f3d5d9-3098-44b0-9d20-aa75142303c4.mp4
 
 ## Relevant Infrastructure
 [Back to Top](#cypress-testing-with-disposable-data-api)
@@ -37,7 +49,6 @@ https://user-images.githubusercontent.com/14102723/188249836-c5e70ac9-ba28-4851-
     * [rig-output.ts](./app/src/rig/rig-output.ts)    
 * [test.route.ts](./app/src/brainstorm/app/routes/test/test.route.ts) - Facilitates Rig API interaction testing outside of the context of Cypress.
 * [cypress](./app/src/brainstorm/cypress)
-    > This infrastructure layout is still being worked on. This will be refactored to facilitate code reuse and minimize code duplication.
     * [test](./app/src/brainstorm/cypress/test/) - Defines route-specific tests and aggregates their execution under a single `Test` class.
         * [home.ts](./app/src/brainstorm/cypress/test/home.ts) - Defines functions for executing tests against 'http://localhost:3000', using the [Rig](./app/src/rig/rig.ts) client to generate / dispose data state.
         * [index.ts](./app/src/brainstorm/cypress/test/index.ts) - Exposes a `Test` class that provides methods pointing to the `test` method of each internal test class.
@@ -76,8 +87,6 @@ Asset | URL | Start
 ### Cypress Walkthrough
 [Back to Top](#cypress-testing-with-disposable-data-api)
 
-> Screenshots / videos still need to be generated.
-
 In VS Code, open three different terminals:
 
 **Terminal 1**
@@ -101,6 +110,21 @@ cd /app/
 npm run e2e-open
 ```
 
+This will launch the Cypress testing app. Click **E2E Testing**:
+
+![image](https://user-images.githubusercontent.com/14102723/191865299-77080a58-3acd-4a0b-a85b-84684cd90e65.png)
+
+Select your browser of choice and click **Start E2E Testing**:
+
+![image](https://user-images.githubusercontent.com/14102723/191867070-1e850729-5ba5-48e4-b390-079e04acd13a.png)
+
+This will load a test browser with any defined Cypress tests. Click **home** to begin executing the home test:  
+
+![image](https://user-images.githubusercontent.com/14102723/191869049-0bc8be90-0188-4808-956f-6d1185e48e3d.png)
+
+![image](https://user-images.githubusercontent.com/14102723/191869302-054d4b08-7fd0-4b0f-b86a-42fefabacd20.png)
+
+
 ### Angular Rig Test Walkthrough
 [Back to Top](#cypress-testing-with-disposable-data-api)
 
@@ -122,40 +146,64 @@ cd /app/
 npm run start
 ```
 
-From a browser, navigate to http://localhost:3000/test.
+The available Rig API endpoints can be found at http://localhost:5001/swagger :
 
-### Rig Server API Walkthrough
-[Back to Top](#cypress-testing-with-disposable-data-api)
+![image](https://user-images.githubusercontent.com/14102723/191869783-9ff9194b-ef7c-41c0-b27e-a817d74db340.png)
 
-> Screenshots are out of date and need to be updated. Still provides a general idea of what the API provides.
 
-1. Starting up the [Brainstorm.Rig](./server/Brainstorm.Rig) project gives access to the API:  
+From a browser, navigate to http://localhost:3000/test :
 
-    ![01-dotnet-run](https://user-images.githubusercontent.com/14102723/185768597-417e5772-4f65-48f7-8d88-29f79b054ce3.png)
+![image](https://user-images.githubusercontent.com/14102723/191869844-8ff87ecc-7d8e-43c5-9b7e-251efd630811.png)
 
-2. Calling the `InitializeDatabase` API method generates the test database:
+Clicking the **Initialize Database** toggle will cause an database instance associated with the displayed connection string to be generated:
 
-    ![02-initialize-database](https://user-images.githubusercontent.com/14102723/185768718-94114c04-75d1-44dd-94df-58211a09f2ba.png)
+![image](https://user-images.githubusercontent.com/14102723/191869947-83e7fb55-2488-48b6-a0ef-69db8224661e.png)
 
-3. Calling the `StartProcess` API method starts the [Brainstorm.Api](./server/Brainstorm.Api) project pointed to the test connection string:
+You can verify the database in SQL Server Management Studio:
 
-    ![03-start-process](https://user-images.githubusercontent.com/14102723/185768726-bd39b80e-d31e-44a4-aff9-72e467c7ad8e.png)
+![image](https://user-images.githubusercontent.com/14102723/191870985-ef9b2243-f716-4ff9-ae1c-fb62277cb608.png)
 
-4. The [Brainstorm.Api](./server/Brainstorm.Api) project is now available to interact with:
+Clicking the **Start Process** toggle will cause a disposable app API process pointed to the disposable database to be initialized:
 
-    ![04-api-swagger](https://user-images.githubusercontent.com/14102723/185768760-a2a06e10-6155-43ea-865b-7c11d889eca8.png)
+![image](https://user-images.githubusercontent.com/14102723/191870043-e5ba9453-96f7-428f-810a-cb0a754e5f7c.png)
 
-5. Example of adding a Topic:
+While this process is runnning, the app API is available. From a separate tab, you can see the endpoints at http://localhost:5000/swagger :
 
-    ![05-api-post](https://user-images.githubusercontent.com/14102723/185768775-c7f986f3-86a0-49c1-a6b6-fc309e9eb086.png)
+![image](https://user-images.githubusercontent.com/14102723/191870175-178d7848-929d-4984-960d-b2f9642a5a15.png)
 
-6. Example of calling the Topic `Query` endpoint:
+This should also enable the **Seed Topic** button at the test route to be enabled. Clicking it will send the JSON `Topic` object to the Rig's `SeedTopic` endpoint and update the displayed JSON with the returned object:
 
-    ![06-api-query](https://user-images.githubusercontent.com/14102723/185768787-ecd435a3-6f6f-43c2-800a-f7f723eb11ac.png)
+![image](https://user-images.githubusercontent.com/14102723/191870301-8664a33b-091a-43fc-8961-2fe4671a1710.png)
 
-7. When the Rig server process ends, it properly disposes of the Api server process and deletes the test database:
+Additionally, more data can be added to the database via the provided topic form:
 
-    ![07-end-session](https://user-images.githubusercontent.com/14102723/185768797-09ff7527-53a8-4bb4-8c74-fca5d47a969c.png)
+![image](https://user-images.githubusercontent.com/14102723/191870536-5bf0a7b7-d3e2-4cca-a516-4c6dbfab9df5.png)
+
+After clicking **Save Topic**, you can validate the data that has been saved by navigating to http://localhost:3000 in a new tab:
+
+![image](https://user-images.githubusercontent.com/14102723/191870649-609f5246-f317-44bd-81c6-4a6ac9791a60.png)
+
+In the test route tab, clicking **Kill Process** will dispose the app API server process and API calls will no longer be available:
+
+![image](https://user-images.githubusercontent.com/14102723/191870792-c34e069d-862c-4e74-a711-ea80779096ee.png)
+
+You can verify this by attempting to navigate back to http://localhost:5000/swagger in a new tab:
+
+![image](https://user-images.githubusercontent.com/14102723/191870862-16aa39e7-4402-4f70-98f4-4ddbbec73729.png)
+
+In the test route, clicking the **Destroy Database** toggle will cause the database to be destroyed:
+
+![image](https://user-images.githubusercontent.com/14102723/191871138-0f0552c4-c9d6-41f9-aa56-e3d9c6bbc96a.png)
+
+You can verify this by refreshing the *Databases* directory in SQL Server Management Studio:
+
+![image](https://user-images.githubusercontent.com/14102723/191871196-76bc0e62-ea05-4f58-9a03-ba29806834da.png)
+
+It's also worth noting that you can initialize a new database and start a new process. Navigating back to the test route will keep track of the process and database state, but not the seeded topic. You can seed the same topic multiple times by refreshing the tab.
+
+Additionally, stopping the Rig server process will cause the app API process to be disposed and the database destroyed:
+
+![image](https://user-images.githubusercontent.com/14102723/191873166-fae635ff-febd-4035-8b80-b5739eb90c0f.png)  
 
 ## Notes
 [Back to Top](#cypress-testing-with-disposable-data-api)
@@ -165,7 +213,7 @@ From a browser, navigate to http://localhost:3000/test.
 
 Testing environment runs using [SQL Server 2019 Express](https://go.microsoft.com/fwlink/p/?linkid=866658) with the server name of `DevSql` and Windows authentication.
 
-In SQL Server Management Studio,right-click the server in object explorer and click **Properties**:
+In SQL Server Management Studio, right-click the server in object explorer and click **Properties**:
 
 * In the **Security** tab, *cross database ownership chaining* is enabled:
 
