@@ -15,7 +15,7 @@
 ## Overview
 [Back to Top](#cypress-testing-with-disposable-data-api)
 
-Given a .NET 6 API using EF Core with SQL Server and a web client, create an API-accessible server that allows a client service to initialize disposable data state from a client service. I refer to this end to end infrastructure as a data rig. When executing Cypress tests, the data state can be initialized before all tests are run and attached to a disposable instance of an app's API server, then disposed of after all tests are completed.
+Given a .NET 6 API using EF Core with SQL Server and a web client, create an API-accessible server that allows a client service to initialize a disposable database and initialize an app API process pointed to the disposable database connection. I refer to this end to end infrastructure as a data rig. When executing Cypress tests, the app api and database can be initialized, and an initial data state can be established before all tests are run, then disposed of after all tests are completed.
 
 The following demonstrates testing out the Rig API and client service via an Angular testing interface:  
 
