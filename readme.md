@@ -126,8 +126,6 @@ This will load a test browser with any defined Cypress tests. Click **home** to 
 ### Angular Rig Test Walkthrough
 [Back to Top](#cypress-testing-with-disposable-data-api)
 
-> Screenshots / videos still need to be generated.
-
 In VS Code, open two different terminals:
 
 **Terminal 1**
